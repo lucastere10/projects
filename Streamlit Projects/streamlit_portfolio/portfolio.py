@@ -9,14 +9,6 @@ import streamlit as st
 from streamlit_lottie import st_lottie
 import requests
 
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import plotly.express as pxrun
-import plotly.io as pio
-
-
 #Page config
 st.set_page_config(page_title = "Lucas Caldas | Dashboards", page_icon=":bar_chart:", layout = 'wide')
 
