@@ -15,8 +15,8 @@ with st.container():
 
 # --- DFs --- #
 with st.container():    
-    df_states = pd.read_csv('Streamlit Projects\streamlit_multipage\pages\data\df_states.csv')
-    json_states = json.load(open("Streamlit Projects\\streamlit_multipage\\pages\\data\\brazil_geo.json"))
+    df_states = pd.read_csv('C:\Portfolio & Projects\projects\Streamlit Projects\streamlit_multipage\pages\data\df_states.csv')
+    json_states = json.load(open("C:\\Portfolio & Projects\\projects\\Streamlit Projects\\streamlit_multipage\\pages\\data\\brazil_geo.json"))
     #df pre processing
     df_states = df_states.rename(columns={'casosAcumulado':'Casos Acumulados',
                               'casosNovos':'Casos Novos',

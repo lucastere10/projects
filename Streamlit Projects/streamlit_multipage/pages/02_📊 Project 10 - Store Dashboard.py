@@ -22,8 +22,8 @@ with st.container():
 
 #read and adapt dataframe
 with st.container():
-    df = pd.read_csv('C:\Portfolio & Projects\Streamlit Projects\streamlit_multipage\pages\data\superstore.csv',encoding='cp1252')
-    states = json.load(open("Streamlit Projects\\streamlit_multipage\\pages\\data\\us_states_data.json",'r'))
+    df = pd.read_csv('C:\Portfolio & Projects\projects\Streamlit Projects\streamlit_multipage\pages\data\superstore.csv',encoding='cp1252')
+    states = json.load(open("C:\\Portfolio & Projects\\projects\\Streamlit Projects\\streamlit_multipage\\pages\\data\\us_states_data.json",'r'))
     #change to datetime
     df['Order Date'] = pd.to_datetime(df['Order Date'])
     df['Ship Date'] = pd.to_datetime(df['Ship Date'])

@@ -11,10 +11,7 @@ import requests
 import plotly.express as px
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import plotly.express as pxrun
-import plotly.io as pio
+
 import json
 
 import os
@@ -35,8 +32,8 @@ df_file = st.sidebar.file_uploader('Choose a File','csv')
 #df = pd.read_csv('Streamlit Projects\project_energy\data\share-electricity-wind.csv')
 df = pd.read_csv(df_file)
 year = df['Year'].unique().tolist()
-countries_features = json.load(open("Streamlit Projects\\project_energy\\data\\world.json",'r'))
-countries_geojson = json.load(open("Streamlit Projects\\project_energy\\data\\countries.geo.json",'r'))
+countries_features = json.load(open("C:\\Portfolio & Projects\\projects\\Streamlit Projects\\streamlit_multipage\\pages\\data\\world.json",'r'))
+countries_geojson = json.load(open("C:\\Portfolio & Projects\\projects\\Streamlit Projects\\streamlit_multipage\\pages\\data\\countries.geo.json",'r'))
 
 #read and adapt dataframe
 with st.container():
