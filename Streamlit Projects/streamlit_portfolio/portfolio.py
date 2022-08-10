@@ -84,4 +84,4 @@ with st.container():
     - Instagram: https://www.instagram.com/lucas.mcaldas/
     - Résumé: [Google Drive](https://drive.google.com/file/d/1lFKemF02INTZ-tgHS3f1Qm5b0wr52bLF/view?usp=sharing)
     ''')
-    st.write('Feel free to leave me message:  [Contact Me >](https://lucastere10.github.io/portfolio/contact/)')
+    st.write('Feel free to leave me a message:  [Contact Me >](https://lucastere10.github.io/portfolio/contact/)')
