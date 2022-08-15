@@ -8,10 +8,10 @@ base_string = '|'
 star_string = "*"
 
 #input de valores
-tree_string = input('Qual string utilizar na sua árvore:')
-tree_input =  round(float(input("Quantos andares tem sua árvore: ")))
-base_input = round(float(input("Qual o tamanho do caule da sua árvore: ")))
-star_input = bool(input('Deseja adicionar uma estrela no topo da sua árvore? (Deixar vazio caso não)'))
+tree_string = input('Qual string utilizar para criar sua árvore: ')
+tree_input =  round(float(input("Qual é o tamanho da sua árvore: ")))
+base_input = round(float(input("Qual o tamanho do tronco da sua árvore: ")))
+star_input = bool(input('Deseja adicionar uma estrela no topo da sua árvore? (Deixar vazio caso negativo): '))
 
 tree_list = range(1, tree_input + 1, 1)
 base_list = range(1, base_input + 1, 1)
@@ -36,3 +36,5 @@ for n in tree_list:
 if tree_input >= 3:   
     for n in base_list:
         print((n_base * space_string) + base_string * 3)
+
+print('Árvore criada com sucesso!')
