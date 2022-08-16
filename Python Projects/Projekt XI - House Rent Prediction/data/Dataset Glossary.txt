@@ -19,3 +19,16 @@ Tenant Preferred: Type of Tenant Preferred by the Owner or Agent.
 Bathroom: Number of Bathrooms.
 
 Point of Contact: Whom should you contact for more information regarding the Houses/Apartments/Flats.
+
+Posted On              81
+BHK                     6
+Rent                  243
+Size                  615
+Floor                 480
+Area Type               3
+Area Locality        2235
+City                    6
+Furnishing Status       3
+Tenant Preferred        3
+Bathroom                8
+Point of Contact        3
