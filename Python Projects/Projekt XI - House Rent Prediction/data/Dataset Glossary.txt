@@ -25,10 +25,22 @@ BHK                     6
 Rent                  243
 Size                  615
 Floor                 480
-Area Type               3
+Area Type               3(2)
 Area Locality        2235
 City                    6
 Furnishing Status       3
 Tenant Preferred        3
 Bathroom                8
 Point of Contact        3
+
+steps
+
+Acquire the dataset.
+Import all the crucial libraries.
+Import the dataset.
+Identifying and handling the missing values.
+Encoding the categorical data.
+Splitting the dataset.
+Feature scaling.
+
+orH$k*FZ1U61
