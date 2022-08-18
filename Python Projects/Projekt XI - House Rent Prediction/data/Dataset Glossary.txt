@@ -44,3 +44,6 @@ Splitting the dataset.
 Feature scaling.
 
 orH$k*FZ1U61
+
+testing house prediction 
+test split 
