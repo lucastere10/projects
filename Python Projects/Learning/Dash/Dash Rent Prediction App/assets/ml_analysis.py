@@ -1,7 +1,7 @@
 import dash
 from dash import dcc, html
 
-tab_2_layout = html.Div([
+tab_1_layout = html.Div([
             html.Div([
                 html.Div([
                     html.H6('Medical Specialty'),

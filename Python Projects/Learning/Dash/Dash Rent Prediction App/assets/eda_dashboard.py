@@ -2,8 +2,6 @@ import dash
 from dash import dcc, html
 
 tab_1_layout = html.Div([
-            # html.H3('Patient Demographics'),
-
                 html.Div([
                     html.Div([
                         html.H6('Gender', style={'textAlign': 'center'}),
