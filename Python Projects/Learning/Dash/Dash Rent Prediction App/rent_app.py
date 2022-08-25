@@ -9,7 +9,7 @@ from assets import eda_dashboard, ml_analysis, dataframe
 
 ### - Styles - ####
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=dbc.themes.Flatly)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 colors = {"background": "#F3F6FA", "background_div": "white", 'text': '#009999'}
 app.config['suppress_callback_exceptions']= True
