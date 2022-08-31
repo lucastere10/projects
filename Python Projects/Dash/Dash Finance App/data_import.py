@@ -12,10 +12,8 @@ from alpha_vantage.timeseries import TimeSeries # pip install alpha-vantage
 
 # -------------------------------------------------------------------------------
 ### Set up initial key and financial category ###
-""" key = '1D0MB8E05Q6QOL2L' # Use your own API Key or support my channel if you're using mine :)
- # https://github.com/RomelTorres/alpha_vantage
- # Chose your output format or default to JSON (python dict)
-ts = TimeSeries(    key, output_format='pandas') # 'pandas' or 'json' or 'csv'
+""" key = '1D0MB8E05Q6QOL2L' #Alpha API Key
+ts = TimeSeries(key, output_format='pandas') # 'pandas' or 'json' or 'csv'
 ttm_data, ttm_meta_data = ts.get_intraday(symbol='TTM',interval='1min', outputsize='compact')
 df = ttm_data.iloc[:50].copy()
 df=df.transpose()
@@ -30,13 +28,12 @@ exit() """
 
 #-----------------------------------------------------------------------------------
 
-
 #read data
-dff = pd.read_csv("Python Projects\\Learning\\Dash\\Dash Finance App\\data\\ttm.csv")
+dff = pd.read_csv("Python Projects\\Dash\\Dash Finance App\\data\\ttm.csv")
 dff = dff[dff.indicator.isin(['high'])]
 
 # APP -----------------------------------------
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.BOOTSTRAP],
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
@@ -47,7 +44,7 @@ SIDEBAR_STYLE = {               # the style arguments for the sidebar. We use po
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "20rem",
+    "width": "16rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }
@@ -68,25 +65,25 @@ theme = {
 # Sidebar ---------------------------------
 sidebar = html.Div([
         html.H6("LOGO", className="display-4"),
-            daq.PowerButton(
+        daq.BooleanSwitch(
             on=True,
             color=theme['primary'],
             id='darktheme-daq-powerbutton',
             className='dark-theme-control'
         ),
-        html.Hr(),
+        html.Hr(),#fa-solid fa-user
         dbc.Nav([
-                dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), " Home"], href="/", active="exact"),                
                 html.Hr(),
-                dbc.NavLink("Stocks", href="/stocks", active="exact"),
-                dbc.NavLink("Crypto", href="/crypto", active="exact"),
-                dbc.NavLink("Watchlist", href="/watchlist", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), " Stocks"], href="/stocks", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), " Crypto"], href="/crypto", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), " Watchlist"], href="/watchlist", active="exact"),
                 html.Hr(),
-                dbc.NavLink("Discover", href="/discover", active="exact"),
-                dbc.NavLink("Trade Markets", href="/markets", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-circle-question"), " Discover"], href="/discover", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-solid fa-money-bill-trend-up"), " Trade Markets"], href="/markets", active="exact"),
                 html.Hr(),
-                dbc.NavLink("My Portfolio", href="/portfolio", active="exact"),
-                dbc.NavLink("Contact", href="/contact", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-user"), " My Portfolio"], href="/portfolio", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), " Contact"], href="/contact", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -95,14 +92,18 @@ sidebar = html.Div([
 )
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 
+
+
 ### --- APP LAYOUT --- ###
 app.layout = dbc.Container([
+     # Chart ------
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardImg(src = 'assets/tata.png',
+                dbc.CardImg(src = 'assets/unnamed.png',
                             top = 'True',
                             style = {"width":'6rem'},
+                            class_name = "rounded-circle",
                 ),
                 dbc.CardBody([
                     dbc.Row([               # STOCK NAME AND TOKEN
@@ -121,26 +122,26 @@ app.layout = dbc.Container([
                     ]),
                     dbc.Row([               # CHANGE, SELL, BUY
                         dbc.Col([
-                            html.P('Change')
+                            dbc.Button("CHANGE"),
                         ]),
                         dbc.Col([
-                            dbc.Button("BUY"),
+                            dbc.Button("LOW"),
                         ]),
                         dbc.Col([
-                            dbc.Button("SELL"),
+                            dbc.Button("HIGH"),
                         ])
                     ]),
                     dbc.Row([
                         dbc.Col([
                             dcc.Graph(id='indicator-graph',figure={},
                                       config = {'displayModeBar': False})
-                        ]),
+                        ], width = 4),
                         dbc.Col([
                             dbc.Label(id='low-price', children="12.237")
-                        ]),
+                        ], width = 4),
                         dbc.Col([
                             dbc.Label(id='high-price', children="13.418")
-                        ])
+                        ], width = 4)
                     ]),
                 ])
             ],                
@@ -151,8 +152,9 @@ app.layout = dbc.Container([
     ], justify='center'),
     dcc.Interval(id='update', n_intervals=0, interval=1000*5),
 
-    #SIDEBAR
-    html.Div([dcc.Location(id="url"), sidebar, content])
+    # Sidebar ------
+    html.Div([dcc.Location(id="url"), sidebar, content]),
+    # Search Bar ------
 
 ])
 
