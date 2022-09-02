@@ -65,6 +65,8 @@ theme = {
 # Sidebar ---------------------------------
 sidebar = html.Div([
         html.H6("LOGO", className="display-4"),
+        html.I(className = "fa-solid fa-angles-right"),
+        html.I(className = "fa-solid fa-angles-left"),
         daq.BooleanSwitch(
             on=True,
             color=theme['primary'],
@@ -73,17 +75,17 @@ sidebar = html.Div([
         ),
         html.Hr(),#fa-solid fa-user
         dbc.Nav([
-                dbc.NavLink([html.I(className = "fa-solid fa-house"), " Home"], href="/", active="exact"),                
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),                
                 html.Hr(),
-                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), " Stocks"], href="/stocks", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-coins"), " Crypto"], href="/crypto", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-eye"), " Watchlist"], href="/watchlist", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], href="/stocks", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], href="/crypto", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Watchlist"], href="/watchlist", active="exact"),
                 html.Hr(),
-                dbc.NavLink([html.I(className = "fa-solid fa-circle-question"), " Discover"], href="/discover", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-solid fa-money-bill-trend-up"), " Trade Markets"], href="/markets", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-circle-question"), "  Discover"], href="/discover", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-solid fa-money-bill-trend-up"), "  Trade Markets"], href="/markets", active="exact"),
                 html.Hr(),
-                dbc.NavLink([html.I(className = "fa-solid fa-user"), " My Portfolio"], href="/portfolio", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), " Contact"], href="/contact", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], href="/portfolio", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], href="/contact", active="exact"),
             ],
             vertical=True,
             pills=True,
