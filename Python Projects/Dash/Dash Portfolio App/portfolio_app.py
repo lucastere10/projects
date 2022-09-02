@@ -10,8 +10,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from alpha_vantage.timeseries import TimeSeries # pip install alpha-vantage
 
+# ICONS --------------------------------------- 
+"fa-brands fa-linkedin"
+"fa-brands fa-github"
+
+
+
 # APP -----------------------------------------
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.BOOTSTRAP],
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
@@ -34,22 +40,46 @@ CONTENT_STYLE = {               # the styles for the main content position it to
 
 # Sidebar ---------------------------------
 sidebar = html.Div([
-        html.P("Lucas Caldas", className="display-4"),
+        html.H1("Lucas Caldas", className="display-4", style={'fontSize': 42}),
         html.Sub('Welcome to my personal portfolio'),
+        dbc.CardImg(src = 'assets/profile_img.png',
+            top = 'True',
+            style = {"width":'6rem'},
+            class_name = "rounded-circle",
+        ),
+        dbc.Row([
+            dbc.Col([
+                dbc.Button(html.I(
+                    className= "fa-brands fa-linkedin"),  
+                    className="rounded-circle",
+                    href="https://www.linkedin.com/in/lucas-caldas50/", active="exact"
+                ),
+            ]),
+            dbc.Col([
+                dbc.Button(html.I(
+                    className= "fa-brands fa-github"),  
+                    className="rounded-circle",
+                    href="https://github.com/lucastere10", active="exact"
+                )
+            ]),
+        ], justify="evenly"
+        ),
         html.Hr(),
-        daq.PowerButton(
+        daq.BooleanSwitch(
             on=True,
             id='darktheme-daq-powerbutton',
             className='dark-theme-control'
         ),
         html.Hr(),
         dbc.Nav([
-                dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),
                 dbc.NavLink("About", href="/about", active="exact"),
                 dbc.NavLink("Portfolio", href="/portfolio", active="exact"),
                 dbc.NavLink("Resume", href="/resume", active="exact"),
                 html.Hr(),
-                dbc.Button("Contact Me", href="/contact", active="exact"),
+                dbc.Button([
+                    html.I(className = "fa-solid fa-envelope"), "  Contact Me"], 
+                    href="/contact", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -57,6 +87,7 @@ sidebar = html.Div([
     ], style=SIDEBAR_STYLE,
 )
 content = html.Div(id="page-content", style=CONTENT_STYLE)
+
 
 
 ### - APP LAYOUT - ###
