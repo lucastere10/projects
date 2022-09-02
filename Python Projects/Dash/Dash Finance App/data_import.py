@@ -94,66 +94,76 @@ sidebar = html.Div([
 )
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 
-
+#card
+card = dbc.Card([
+        dbc.CardImg(src = 'assets/unnamed.png',
+                    top = 'True',
+                    style = {"width":'6rem'},
+                    class_name = "rounded-circle",
+        ),
+        dbc.CardBody([
+            dbc.Row([               # STOCK NAME AND TOKEN
+                dbc.Col([
+                    html.P('TATA Motors')
+                ]),
+                dbc.Col([
+                    html.P('TTM')
+                ]) 
+            ]),
+            dbc.Row([               #GRAPH
+                dbc.Col([
+                    dcc.Graph(id='daily-line', figure={},
+                                config={'displayModeBar':False})
+                ])
+            ]),
+            dbc.Row([               # CHANGE, SELL, BUY
+                dbc.Col([
+                    dbc.Button("CHANGE"),
+                ]),
+                dbc.Col([
+                    dbc.Button("LOW"),
+                ]),
+                dbc.Col([
+                    dbc.Button("HIGH"),
+                ])
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    dcc.Graph(id='indicator-graph',figure={},
+                                config = {'displayModeBar': False})
+                ], width = 4),
+                dbc.Col([
+                    dbc.Label(id='low-price', children="12.237")
+                ], width = 4),
+                dbc.Col([
+                    dbc.Label(id='high-price', children="13.418")
+                ], width = 4)
+            ]),
+        ])
+    ], style={"width": "24rem"}, className="mt-3"
+    )
 
 ### --- APP LAYOUT --- ###
 app.layout = dbc.Container([
-     # Chart ------
+     # Cards ------
     dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardImg(src = 'assets/unnamed.png',
-                            top = 'True',
-                            style = {"width":'6rem'},
-                            class_name = "rounded-circle",
-                ),
-                dbc.CardBody([
-                    dbc.Row([               # STOCK NAME AND TOKEN
-                        dbc.Col([
-                            html.P('TATA Motors')
-                        ]),
-                        dbc.Col([
-                            html.P('TTM')
-                        ]) 
-                    ]),
-                    dbc.Row([               #GRAPH
-                        dbc.Col([
-                            dcc.Graph(id='daily-line', figure={},
-                                      config={'displayModeBar':False})
-                        ])
-                    ]),
-                    dbc.Row([               # CHANGE, SELL, BUY
-                        dbc.Col([
-                            dbc.Button("CHANGE"),
-                        ]),
-                        dbc.Col([
-                            dbc.Button("LOW"),
-                        ]),
-                        dbc.Col([
-                            dbc.Button("HIGH"),
-                        ])
-                    ]),
-                    dbc.Row([
-                        dbc.Col([
-                            dcc.Graph(id='indicator-graph',figure={},
-                                      config = {'displayModeBar': False})
-                        ], width = 4),
-                        dbc.Col([
-                            dbc.Label(id='low-price', children="12.237")
-                        ], width = 4),
-                        dbc.Col([
-                            dbc.Label(id='high-price', children="13.418")
-                        ], width = 4)
-                    ]),
-                ])
-            ],                
-            style={"width": "24rem"},
-            className="mt-3"
-            )
-        ], width=6)
+        dbc.Col([html.Div(card)], width=6),
+        dbc.Col([]),
+        dbc.Col([]),
     ], justify='center'),
-    dcc.Interval(id='update', n_intervals=0, interval=1000*5),
+    dbc.Row([
+        dbc.Col([]),
+        dbc.Col([]),
+        dbc.Col([]),
+    ], justify='center'),
+    dbc.Row([
+        dbc.Col([]),
+        dbc.Col([]),
+        dbc.Col([]),
+    ], justify='center'),
 
+    # Invervals ------
+    dcc.Interval(id='update', n_intervals=0, interval=1000*5),
     # Sidebar ------
     html.Div([dcc.Location(id="url"), sidebar, content]),
     # Search Bar ------
