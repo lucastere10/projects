@@ -2,7 +2,7 @@
 import pandas as pd
 from pandas_datareader import data
 import dash
-from dash import dcc, html, Input, Output
+from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 
 #start
@@ -17,20 +17,46 @@ app.config['suppress_callback_exceptions'] = True
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
     "position": "fixed",
-    "top": 0,
+    "top": 62.5,
     "left": 0,
     "bottom": 0,
     "width": "16rem",
-    "padding": "2rem 1rem",
+    "height": "100%",
+    "z-index": 1,
+    "overflow-x": "hidden",
+    "transition": "all 0.5s",
+    "padding": "0.5rem 1rem",
+    "background-color": "#f8f9fa",
+}
+SIDEBAR_HIDEN = {
+    "position": "fixed",
+    "top": 62.5,
+    "left": "-16rem",
+    "bottom": 0,
+    "width": "16rem",
+    "height": "100%",
+    "z-index": 1,
+    "overflow-x": "hidden",
+    "transition": "all 0.5s",
+    "padding": "0rem 0rem",
     "background-color": "#f8f9fa",
 }
 
 # the styles for the main content position it to the right of the sidebar and
 # add some padding.
 CONTENT_STYLE = {
+    "transition": "margin-left .5s",
     "margin-left": "18rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+CONTENT_STYLE1 = {
+    "transition": "margin-left .5s",
+    "margin-left": "2rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
 }
 
 sidebar = html.Div(
@@ -77,6 +103,34 @@ def render_page_content(pathname):
         ],
         className="p-3 bg-light rounded-3",
     )
+
+#colapse sidebar
+@app.callback(
+    [
+        Output("sidebar", "style"),
+        Output("page-content", "style"),
+        Output("side_click", "data"),
+    ],
+
+    [Input("btn_sidebar", "n_clicks")],
+    [
+        State("side_click", "data"),
+    ]
+)
+def toggle_sidebar(n, nclick):
+    if n:
+        if nclick == "SHOW":
+            sidebar_style = SIDEBAR_HIDEN
+            content_style = CONTENT_STYLE1
+            cur_nclick = "HIDDEN"
+        else:
+            sidebar_style = SIDEBAR_STYLE
+            content_style = CONTENT_STYLE
+            cur_nclick = "SHOW"
+    else:
+        sidebar_style = SIDEBAR_STYLE
+        content_style = CONTENT_STYLE
+        cur_nclick = 'SHOW'
 
 
 if __name__ == "__main__":
