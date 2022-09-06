@@ -3,7 +3,7 @@
 from tracemalloc import stop
 from turtle import ht, width
 import dash  #pip install dash
-from dash import html, dcc, Output, Input, State                              
+from dash import html, dcc, Output, Input, State, dash_table                       
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import dash_daq as daq                     # pip install dash_daq
 import pandas as pd 
@@ -34,7 +34,7 @@ SIDEBAR_STYLE = {
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "16rem",
+    "width": "14rem",
     "height": "100%",
     "z-index": 1,
     "overflow-x": "hidden",
@@ -57,9 +57,7 @@ SIDEBAR_HIDEN = {
 }
 # Content Style ------------
 CONTENT_STYLE = {
-    "transition": "margin-left .5s",
-    "margin-left": "17rem",
-    "margin-right": "2rem",
+    "margin-left": "15rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }
@@ -103,79 +101,92 @@ sidebar = html.Div([
         ),            
     ], style=SIDEBAR_STYLE,  id="sidebar",
 )
+# navbar -------------
+search_bar = dbc.Row([
+    dbc.Col([
+        dcc.Dropdown(nasdaq["Name"].values.tolist(), "Armada Acquisition Corp. I Unit", 
+        id = 'search_stock_id'
+        ),
+    ]),
+    dbc.Col([
+         dbc.Button(
+            "Search", color="primary", className="ms-2", n_clicks=0
+        ) 
+    ], width="auto")
+])
 # content ------------
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 # card ---------------
 card = dbc.Card([
-        dbc.CardImg(src = 'assets/unnamed.png',
+        dbc.Row([
+            dbc.Col([
+                dbc.CardImg(
+                    src = 'assets/unnamed.png',
                     top = 'True',
                     style = {"width":'6rem'},
-                    class_name = "rounded-circle",
-        ),
+                  class_name = "rounded-circle",
+                ),
+            ], width = 3),
+            dbc.Col([
+                dbc.Row([html.P('TATA Motors')], align = 'center'),
+                dbc.Row([html.P('TTM')], align = 'center'),
+            ], width = 9)
+        ]),
         dbc.CardBody([
-            dbc.Row([               # STOCK NAME AND TOKEN
-                dbc.Col([
-                    html.P('TATA Motors')
-                ]),
-                dbc.Col([
-                    html.P('TTM')
-                ]) 
-            ]),
             dbc.Row([               #GRAPH
                 dbc.Col([
-                    dcc.Graph(id='daily-line', figure={},
+                    dcc.Graph(figure={},
                                 config={'displayModeBar':False})
                 ])
             ]),
             dbc.Row([               # CHANGE, SELL, BUY
                 dbc.Col([
                     dbc.Button("CHANGE"),
-                ]),
+                ], width = 4),
                 dbc.Col([
                     dbc.Button("LOW"),
-                ]),
+                ], width = 4),
                 dbc.Col([
                     dbc.Button("HIGH"),
-                ])
-            ]),
+                ], width = 4)
+            ], align = 'center', justify="evenly"
+            ),
             dbc.Row([
                 dbc.Col([
-                    dcc.Graph(id='indicator-graph',figure={},
-                                config = {'displayModeBar': False})
+                    dbc.Label(children="1,32%")
                 ], width = 4),
                 dbc.Col([
-                    dbc.Label(id='low-price', children="12.237")
+                    dbc.Label(children="12.237")
                 ], width = 4),
                 dbc.Col([
-                    dbc.Label(id='high-price', children="13.418")
+                    dbc.Label(children="13.418")
                 ], width = 4)
-            ]),
+            ],align = 'center', justify="evenly"
+            ),
         ])
-    ], style={"width": "24rem"}, className="mt-3"
+    ], style={"width": "22rem"}
     )
 
 ### --- APP LAYOUT --- ###
 app.layout = dbc.Container([
     # Stock Input
-    dcc.Dropdown(nasdaq["Name"].values.tolist(), "PBR", id = 'search_stock_id'),
-    html.Div(id='dd-output-container'),
+    dbc.Row(html.Div(search_bar), style={"width": "48rem"}),
+    dbc.Row(html.Div(id='dd-output-container')),
+    dbc.Row(html.Div(dcc.Dropdown(nasdaq['Country'].unique(), multi=True)), style={"width": "32rem"}),
+    dbc.Row(html.Div(dcc.Dropdown(nasdaq['Sector'].unique(), multi=True)), style={"width": "32rem"}),
+    dbc.Row(html.Div(dcc.Dropdown(nasdaq['Industry'].unique(), multi=True)), style={"width": "32rem"}),
      # Cards ------
     html.Div([
         dbc.Row([
-            dbc.Col([html.Div(card)], width=6),
-            dbc.Col([]),
-            dbc.Col([]),
-        ], justify='center'),
+            dbc.Col([html.Div(card)]),
+            dbc.Col([html.Div(card)]),
+            dbc.Col([html.Div(card)]),
+        ]),
         dbc.Row([
-            dbc.Col([]),
-            dbc.Col([]),
-            dbc.Col([]),
-        ], justify='center'),
-        dbc.Row([
-            dbc.Col([]),
-            dbc.Col([]),
-            dbc.Col([]),
-        ]), 
+            dbc.Col([
+                #dash_table.DataTable(df)
+            ]),
+        ], justify='center') 
     ], style = CONTENT_STYLE
     ),
     # Invervals ------
@@ -192,11 +203,11 @@ app.layout = dbc.Container([
         Input("search_stock_id","value")
 )
 def update_output(value):
-    stock = nasdaq['Symbol'][nasdaq['Name'] == value]
-    return f'You have selected {stock}'
+    stock = str(nasdaq['Symbol'][nasdaq['Name'] == value])
+    return f'{stock}'
 
-# update graph --------------------
-@app.callback(
+# colapse sidebar --------------------
+""" @app.callback(
     [
         Output("sidebar", "style"),
         Output("page-content", "style"),
@@ -222,7 +233,7 @@ def toggle_sidebar(n, nclick):
         sidebar_style = SIDEBAR_STYLE
         content_style = CONTENT_STYLE
         cur_nclick = 'SHOW'
-
+ """
 # run some shit --------------------------------------------
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)

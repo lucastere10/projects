@@ -6,4 +6,6 @@ print(nasdaq.head())
 
 test = 'Armada Acquisition Corp. I Warrant'
 
-print(nasdaq['Symbol'][nasdaq['Name'] == test])
+#print(str(nasdaq['Symbol'][nasdaq['Name'] == test]))
+print(nasdaq['Country'].unique())
+
