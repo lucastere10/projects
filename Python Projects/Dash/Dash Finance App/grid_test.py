@@ -15,6 +15,7 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FO
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
 
+# sidebar
 # card
 card = dbc.Card(
     dbc.CardBody(
@@ -39,7 +40,7 @@ sidebar = html.Div([
         html.H1('GRID TEST', className = {'font-size : 20'})
 ])
 CONTENT_STYLE = {               # the styles for the main content position it to the right of the sidebar
-    "margin-left": "18rem",
+    "margin-left": "14rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }

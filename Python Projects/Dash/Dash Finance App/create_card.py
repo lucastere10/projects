@@ -1,4 +1,5 @@
-
+from dash import dcc, html, State, Input, Output
+import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 
 def create_card(card_id, title, description):
     return dbc.Card(
