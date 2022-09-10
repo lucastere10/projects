@@ -8,6 +8,7 @@ import dash_daq as daq                     # pip install dash_daq
 import pandas as pd 
 import plotly.express as px
 import plotly.graph_objects as go
+from create_card import create_card
 
 # APP --------------
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
@@ -15,38 +16,70 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FO
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
 
-# sidebar
-# card
-card = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H4("Title", className="card-title"),
-            html.H6("Card subtitle", className="card-subtitle"),
-            html.P(
-                "Some quick example text to build on the card title and make "
-                "up the bulk of the card's content.",
-                className="card-text",
-            ),
-            dbc.CardLink("Card link", href="#"),
-            dbc.CardLink("External link", href="https://google.com"),
-        ]
-    ),
-    style={"width": "18rem"},
-)
-
+### STYLES ### ------------------------------------------------------------------
+# Sidebar Style ------------
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "14rem",
+    "height": "100%",
+    "z-index": 1,
+    "overflow-x": "hidden",
+    "transition": "all 0.5s",
+    "padding": "0.5rem 1rem",
+    "background-color": "#f8f9fa",
+}
+SIDEBAR_HIDEN = {
+    "position": "fixed",
+    "top": 0,
+    "left": "-16rem",
+    "bottom": 0,
+    "width": "16rem",
+    "height": "100%",
+    "z-index": 1,
+    "overflow-x": "hidden",
+    "transition": "all 0.5s",
+    "padding": "0rem 0rem",
+    "background-color": "#f8f9fa",
+}
+# Content Style ------------
+CONTENT_STYLE = {
+    "margin-left": "15rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+CONTENT_STYLE1 = {
+    "transition": "margin-left .5s",
+    "margin-left": "2rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
 
 # Sidebar ------------------------------
 sidebar = html.Div([
-        html.H1('GRID TEST', className = {'font-size : 20'})
-])
-CONTENT_STYLE = {               # the styles for the main content position it to the right of the sidebar
-    "margin-left": "14rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-}
-content = html.Div(id="page-content", style=CONTENT_STYLE)
-
-    #html.Div(card)
+        html.H6("GRID", className="display-4"),
+        html.Hr(),#fa-solid fa-user
+        dbc.Nav([
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),                
+                html.Hr(),
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], href="/stocks", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], href="/crypto", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Watchlist"], href="/watchlist", active="exact"),
+                html.Hr(),
+                dbc.NavLink([html.I(className = "fa-solid fa-circle-question"), "  Discover"], href="/discover", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-solid fa-money-bill-trend-up"), "  Trade Markets"], href="/markets", active="exact"),
+                html.Hr(),
+                dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], href="/portfolio", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], href="/contact", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),            
+    ], style=SIDEBAR_STYLE,  id="sidebar",
+)
 
 
 app.layout = dbc.Container([
@@ -55,22 +88,12 @@ app.layout = dbc.Container([
         html.H6('TITLE')
     ]),
     dbc.Row([
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
+        dbc.Col([html.Div(create_card('PBR', 'Petrobrás'))]),
+        dbc.Col([html.Div(create_card('BRT', 'Veículos RJ'))]),
+        dbc.Col([html.Div(create_card('TSL', 'Tesla Motors'))]),
     ]),
-    dbc.Row([
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
-    ]),
-    dbc.Row([
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
-        dbc.Col([html.Div(card)]),
-    ]),
-
-])
+    html.Div(sidebar),
+], style = CONTENT_STYLE)
 
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)
