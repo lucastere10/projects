@@ -1,7 +1,10 @@
 from dash import dcc, html, State, Input, Output
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
+import dash_daq as daq                     # pip install dash_daq
+import pandas as pd
 
-# card ---------------
+nasdaq = pd.read_csv('Python Projects\\Dash\\Dash Finance App\\data\\nasdaq.csv')
+
 ### STYLES ### ------------------------------------------------------------------
 # Sidebar Style ------------
 SIDEBAR_STYLE = {
@@ -14,7 +17,7 @@ SIDEBAR_STYLE = {
     "z-index": 1,
     "overflow-x": "hidden",
     "transition": "all 0.5s",
-    "padding": "0.5rem 1rem",
+    "padding": "0.5rem 1rem", #"padding": "4rem 1rem 2rem",
     "background-color": "#f8f9fa",
 }
 SIDEBAR_HIDEN = {
@@ -33,8 +36,19 @@ SIDEBAR_HIDEN = {
 
 # Sidebar ------------------------------
 sidebar = html.Div([
-        html.H6("GRID", className="display-4"),
-        html.Hr(),#fa-solid fa-user
+            dbc.Row([
+                dbc.Col(html.H6("LOGO", className="display-4"), width = 11),
+                dbc.Col([
+                    dbc.Button(html.I(
+                    className = "fa-solid fa-angles-right"),
+                    outline=True, 
+                    color="secondary", 
+                    className="mr-1", 
+                    id="btn_sidebar"
+                    ),
+                ], width = 1),
+            ]),
+        html.Hr(),
         dbc.Nav([
                 dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),                
                 html.Hr(),
@@ -47,9 +61,29 @@ sidebar = html.Div([
                 html.Hr(),
                 dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], href="/portfolio", active="exact"),
                 dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], href="/contact", active="exact"),
+                daq.ToggleSwitch(id='my-toggle-switch',value=False),
             ],
             vertical=True,
             pills=True,
         ),            
     ], style=SIDEBAR_STYLE,  id="sidebar",
 )
+
+# navbar -------------
+search_bar = dbc.Row([
+    dbc.Col([
+        dcc.Dropdown(nasdaq["Name"].values.tolist(), "Armada Acquisition Corp. I Unit", 
+        id = 'search_stock_id'
+        ),
+    ]),
+    dbc.Col([
+            dbc.Button([html.I(className = "fa-solid fa-filter"), " Filters"],
+            color="primary", className="ms-2", n_clicks=0,
+            ),
+    ], width = 'auto'),
+    dbc.Col([
+        dbc.Button([html.I(className = "fa-solid fa-magnifying-glass"), " Search"],
+        color="primary", className="ms-2", n_clicks=0
+        ) 
+    ], width="auto"),
+])
