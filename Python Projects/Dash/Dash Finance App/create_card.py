@@ -9,14 +9,14 @@ def create_card(card_id, title):
                     dbc.CardImg(
                         src = 'assets/unnamed.png',
                         top = 'False',
-                        style = {"width":'4rem'},
+                        style = {"width":'4rem', "padding": "0.5rem 0.5rem"},
                         class_name = "rounded-circle",
                     ),
-                ], width = 4),
+                ], width = 2),
                 dbc.Col([
-                    dbc.Row([html.P(title, id = f"{card_id}-title")], align = 'rigth'),
-                    dbc.Row([html.P(card_id, id = f'{card_id}-id')], align = 'rigth'),
-                ], width = 8)
+                    dbc.Row([html.H4(title, id = f"{card_id}-title")], style={'font-size': '6px'}),
+                    dbc.Row([html.P(card_id, id = f'{card_id}-id')], style={'font-size': '16px'}),
+                ], width = 10),
             ]),
             dbc.CardBody([
                 dbc.Row([               #GRAPH

@@ -39,14 +39,17 @@ CONTENT_STYLE1 = {
 app.layout = dbc.Container([
     #chart grid
     dbc.Row(dbc.Col([search_bar], width = 8, align='center'), justify="center"),
+    html.Br(),
     dbc.Row([
         dbc.Col([html.Div(create_card('PBR', 'Petrobrás'))]),
         dbc.Col([html.Div(create_card('BRT', 'Veículos RJ'))]),
         dbc.Col([html.Div(create_card('TSL', 'Tesla Motors'))]),
     ]),
+    html.Br(),
     sidebar,
     dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
 ], style = CONTENT_STYLE)
+
 
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)

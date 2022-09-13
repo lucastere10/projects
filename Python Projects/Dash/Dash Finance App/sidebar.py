@@ -72,15 +72,15 @@ sidebar = html.Div([
 # navbar -------------
 search_bar = dbc.Row([
     dbc.Col([
+            dbc.Button([html.I(className = "fa-solid fa-filter"), " Filters"],
+            color="secondary", className="ms-2", n_clicks=0,  style={'font-size': '12px', 'width': '85px', 'display': 'inline-block'},
+            ),
+    ], width = 'auto'),
+    dbc.Col([
         dcc.Dropdown(nasdaq["Name"].values.tolist(), "Armada Acquisition Corp. I Unit", 
         id = 'search_stock_id'
         ),
     ]),
-    dbc.Col([
-            dbc.Button([html.I(className = "fa-solid fa-filter"), " Filters"],
-            color="primary", className="ms-2", n_clicks=0,
-            ),
-    ], width = 'auto'),
     dbc.Col([
         dbc.Button([html.I(className = "fa-solid fa-magnifying-glass"), " Search"],
         color="primary", className="ms-2", n_clicks=0
