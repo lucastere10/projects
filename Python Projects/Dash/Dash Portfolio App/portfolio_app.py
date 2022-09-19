@@ -8,7 +8,6 @@ import dash_daq as daq                     # pip install dash_daq
 import pandas as pd 
 import plotly.express as px
 import plotly.graph_objects as go
-from alpha_vantage.timeseries import TimeSeries # pip install alpha-vantage
 
 # ICONS --------------------------------------- 
 "fa-brands fa-linkedin"
@@ -42,11 +41,6 @@ CONTENT_STYLE = {               # the styles for the main content position it to
 sidebar = html.Div([
         html.H1("Lucas Caldas", className="display-4", style={'fontSize': 42}),
         html.Sub('Welcome to my personal portfolio'),
-        dbc.CardImg(src = 'assets/profile_img.png',
-            top = 'True',
-            style = {"width":'6rem'},
-            class_name = "rounded-circle",
-        ),
         dbc.Row([
             dbc.Col([
                 dbc.Button(html.I(
@@ -65,12 +59,6 @@ sidebar = html.Div([
         ], justify="evenly"
         ),
         html.Hr(),
-        daq.BooleanSwitch(
-            on=True,
-            id='darktheme-daq-powerbutton',
-            className='dark-theme-control'
-        ),
-        html.Hr(),
         dbc.Nav([
                 dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),
                 dbc.NavLink("About", href="/about", active="exact"),
@@ -83,6 +71,11 @@ sidebar = html.Div([
             ],
             vertical=True,
             pills=True,
+        ),
+        daq.BooleanSwitch(
+            on=True,
+            id='darktheme-daq-powerbutton',
+            className='dark-theme-control'
         ),            
     ], style=SIDEBAR_STYLE,
 )
