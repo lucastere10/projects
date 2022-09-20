@@ -20,7 +20,7 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FO
                 )
 
 # Get Data ---------
-symbol = 'BRAG'
+symbol = 'SID'
 url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
 r = requests.get(url)
 co_data = r.json()
@@ -29,6 +29,8 @@ co_id = co_data['Symbol']
 url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=BR&topics=economy&apikey={key}'
 r = requests.get(url)
 feed_data = r.json()
+df = pd.read_csv('data\\ttm.csv')
+df['date'] = pd.to_datetime(df["date"])
 
 ### STYLES ### ------------------------------------------------------------------
 # Content Style ------------
@@ -45,72 +47,54 @@ CONTENT_STYLE1 = {
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }
+SMALLCARD_STYLE = {
+    "width": "12rem",
+    "padding": "0.2em",
+    "background-color": "#f8f9fa",
+}
 
-overview = html.Div([
-        dbc.Button("Info", id="overview_open", n_clicks=0),
+
+### FUNCTIONS ### ------------------------------------------------------------------
+#create cards
+def small_card(x):
+    return dbc.Card(
+    dbc.CardBody([
+            html.H4(x, className="card-title",style={'fontSize': '1em'}),
+            html.H6(co_data[x], className="card-subtitle",style={'fontSize': '1em'}),
+    ]),
+    style = SMALLCARD_STYLE,
+    )
+
+
+### OBJECTS ### ------------------------------------------------------------------
+# Stock Description
+info = html.Div([
+        dbc.Button(html.I(className='fa-solid fa-info'), id="info_open", n_clicks=0),
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle(co_data['Name'])),
                 dbc.ModalBody(co_data['Description']),
                 dbc.ModalFooter(
                     dbc.Button(
-                        "Close", id="overview_close", className="ms-auto", n_clicks=0
+                        "Close", id="info_close", className="ms-auto", n_clicks=0
                     )
                 ),
             ],
-            id="overview",
+            id="info",
             is_open=False,
         ),
     ]
 )
 
-tabs = dbc.Tabs([
-        dbc.Tab('Overview', label="Overview"),
-        dbc.Tab('Feed', label="Feed"),
-        dbc.Tab('Stats', label="Stats"),
-        dbc.Tab('Charts', label="Charts"),
-])
+fig = go.Figure(data=[go.Candlestick(x=df['date'],
+                open  = df[df['indicator'] == 'open'],
+                high  = df[df['indicator'] == 'high'],
+                low   = df[df['indicator'] == 'low'],
+                close = df[df['indicator'] == 'close'])])
 
-#create cards
-def small_card(x):
-    return dbc.Card(
-    dbc.CardBody(
-        [
-            html.H4(x, className="card-title"),
-            html.H6(co_data[x], className="card-subtitle"),
-
-        ]
-    ),
-    style={"width": "14rem"},
-    )
-
-
-app.layout = dbc.Container([
-    #chart grid
-    dbc.Row(dbc.Col([search_bar], width = 8, align='center'), justify="center"),
-    html.Hr(),
-    dbc.Row([
-        html.Div([
-            html.H4(co_data['Name'], id = f"{co_id}-name"),
-            html.H4(co_data['Symbol'], id = f'{co_id}-id'),
-            overview
-        ])
-    ],justify="start", style={'font-size': '6px'}
-    ),
+# Tabs Content
+tab1_content = html.Div([
     html.Br(),
-    dbc.Row([
-        dbc.Col([        
-        ], width=5),
-        dbc.Col([
-            
-        ], width=7),
-    ]),
-    html.Br(),
-    dbc.Row([
-        tabs
-    ]),
-    html.Br(),  
-    #charts
     dbc.Row([
         dbc.Col([
             small_card('Exchange')
@@ -118,7 +102,7 @@ app.layout = dbc.Container([
         dbc.Col([
             small_card('Currency')
         ]),
-    ]),
+    ], justify = 'start'),
     dbc.Row([
         dbc.Col([
             small_card('Country')
@@ -128,23 +112,50 @@ app.layout = dbc.Container([
         ])
     ]),
     dbc.Row([
-        small_card('Industry')
+        dbc.Col([
+            small_card('Industry')
+        ]),
+        dbc.Col([
+
+        ])
+    ]),
+])
+tab2_content = html.Div([dcc.Graph(figure=fig)])
+
+
+# Create Tabs
+tabs = dbc.Tabs([
+        dbc.Tab(tab1_content, label = "Overview"),
+        dbc.Tab('Feed',     label = "Feed"),
+        dbc.Tab('Stats',    label = "Stats"),
+        dbc.Tab(tab2_content,   label = "Charts"),
+])
+
+### APP LAYOUT ### ------------------------------------------------------------------
+app.layout = dbc.Container([
+    # Search Bar
+    dbc.Row(dbc.Col([search_bar], width = 8, align='center'), justify="center"),
+    html.Hr(),
+    # Name And Symbol
+    dbc.Row([
+        dbc.Col([
+            html.H4([f"{co_data['Name']} | {co_data['Symbol']}", info], id = f"{co_id}-name"),
+        ], style={'font-size': '6px'}
+        ),
+    ], justify="start",
+    ),
+    html.Br(),
+    dbc.Row([
+        tabs
     ]),
     sidebar,
-], style = CONTENT_STYLE)
+], style = CONTENT_STYLE,)
 
-
-
-
-
-
-
-
-# CALLBACKS -----------------------------------------
+### CALLBACKS ### ------------------------------------------------------------------
 @app.callback(
-    Output("overview", "is_open"),
-    [Input("overview_open", "n_clicks"), Input("overview_close", "n_clicks")],
-    [State("overview", "is_open")],
+    Output("info", "is_open"),
+    [Input("info_open", "n_clicks"), Input("info_close", "n_clicks")],
+    [State("info", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:

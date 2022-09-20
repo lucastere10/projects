@@ -23,9 +23,9 @@ SIDEBAR_STYLE = {
 SIDEBAR_HIDEN = {
     "position": "fixed",
     "top": 0,
-    "left": "-16rem",
+    "left": "-14rem",
     "bottom": 0,
-    "width": "16rem",
+    "width": "14rem",
     "height": "100%",
     "z-index": 1,
     "overflow-x": "hidden",
@@ -37,7 +37,9 @@ SIDEBAR_HIDEN = {
 # Sidebar ------------------------------
 sidebar = html.Div([
             dbc.Row([
-                dbc.Col(html.H6("LOGO", className="display-4"), width = 11),
+                dbc.Col([
+                    html.H6("LOGO", className="display-4", style={'fontSize': '2rem'})
+                ], align = 'center'),
                 dbc.Col([
                     dbc.Button(html.I(
                     className = "fa-solid fa-angles-right"),
@@ -46,8 +48,8 @@ sidebar = html.Div([
                     className="mr-1", 
                     id="btn_sidebar"
                     ),
-                ], width = 1),
-            ]),
+                ], align = 'center'),
+            ], justify = 'start'),
         html.Hr(),
         dbc.Nav([
                 dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),                
@@ -72,8 +74,8 @@ sidebar = html.Div([
 # navbar -------------
 search_bar = dbc.Row([
     dbc.Col([
-            dbc.Button([html.I(className = "fa-solid fa-filter"), " Filters"],
-            color="secondary", className="ms-2", n_clicks=0,  style={'font-size': '12px', 'width': '85px', 'display': 'inline-block'},
+            dbc.Button([html.I(className = "fa-solid fa-filter")],
+            color="secondary", className="ms-2", n_clicks=0,  style={'font-size': '12px', 'display': 'inline-block'},
             ),
     ], width = 'auto'),
     dbc.Col([
@@ -82,7 +84,7 @@ search_bar = dbc.Row([
         ),
     ]),
     dbc.Col([
-        dbc.Button([html.I(className = "fa-solid fa-magnifying-glass"), " Search"],
+        dbc.Button([html.I(className = "fa-solid fa-magnifying-glass")],
         color="primary", className="ms-2", n_clicks=0
         ) 
     ], width="auto"),
