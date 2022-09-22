@@ -79,13 +79,14 @@ search_bar = dbc.Row([
             ),
     ], width = 'auto'),
     dbc.Col([
-        dcc.Dropdown(nasdaq["Name"].values.tolist(), "Armada Acquisition Corp. I Unit", 
-        id = 'search_stock_id'
+        dcc.Dropdown(nasdaq["Name"].values.tolist(), 
+        id = 'search_stock_dropdown'
         ),
     ]),
     dbc.Col([
         dbc.Button([html.I(className = "fa-solid fa-magnifying-glass")],
-        color="primary", className="ms-2", n_clicks=0
+        color="primary", className="ms-2", n_clicks=0, id = 'search_stock_button'
         ) 
     ], width="auto"),
 ])
+
