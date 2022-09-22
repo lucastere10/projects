@@ -5,6 +5,7 @@ import dash  #pip install dash
 from dash import html, dcc, Output, Input, State, dash_table                    
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import dash_daq as daq                     # pip install dash_daq
+from dash.exceptions import PreventUpdate
 import pandas as pd 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -15,22 +16,16 @@ key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
 # APP --------------
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
+                suppress_callback_exceptions=True,
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
 
 # Get Data ---------
-symbol = 'SID'
-url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
-r = requests.get(url)
-co_data = r.json()
-co_id = co_data['Symbol']
-# replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
-url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=BR&topics=economy&apikey={key}'
-r = requests.get(url)
-feed_data = r.json()
-df = pd.read_csv('data\\ttm.csv')
+df = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\ttm.csv')
 df['date'] = pd.to_datetime(df["date"])
+#Stocks Tickters
+nasdaq = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\nasdaq.csv')
 
 ### STYLES ### ------------------------------------------------------------------
 # Content Style ------------
@@ -53,18 +48,16 @@ SMALLCARD_STYLE = {
     "background-color": "#f8f9fa",
 }
 
-
 ### FUNCTIONS ### ------------------------------------------------------------------
 #create cards
 def small_card(x):
     return dbc.Card(
     dbc.CardBody([
-            html.H4(x, className="card-title",style={'fontSize': '1em'}),
-            html.H6(co_data[x], className="card-subtitle",style={'fontSize': '1em'}),
+            html.H4(className="card-title",style={'fontSize': '1em'},id = f"{x}-sc-title-id"),
+            html.H6(className="card-subtitle",style={'fontSize': '1em'},id = f"{x}-sc-sub-id"),
     ]),
     style = SMALLCARD_STYLE,
     )
-
 
 ### OBJECTS ### ------------------------------------------------------------------
 # Stock Description
@@ -72,8 +65,8 @@ info = html.Div([
         dbc.Button(html.I(className='fa-solid fa-info'), id="info_open", n_clicks=0),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle(co_data['Name'])),
-                dbc.ModalBody(co_data['Description']),
+                dbc.ModalHeader(id = 'description-title-id'),
+                dbc.ModalBody(id = 'description-body-id'),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close", id="info_close", className="ms-auto", n_clicks=0
@@ -86,7 +79,7 @@ info = html.Div([
     ]
 )
 
-fig = go.Figure(data=[go.Candlestick(x=df['date'],
+chart = go.Figure(data=[go.Candlestick(x=df['date'],
                 open  = df[df['indicator'] == 'open'],
                 high  = df[df['indicator'] == 'high'],
                 low   = df[df['indicator'] == 'low'],
@@ -120,26 +113,32 @@ tab1_content = html.Div([
         ])
     ]),
 ])
-tab2_content = html.Div([dcc.Graph(figure=fig)])
+tab2_content = html.Div([dcc.Graph(figure=chart)])
+tab3_content = html.Div([dcc.Graph(figure=chart)])
+tab4_content = html.Div([dcc.Graph(figure=chart)])
 
 
 # Create Tabs
 tabs = dbc.Tabs([
         dbc.Tab(tab1_content, label = "Overview"),
-        dbc.Tab('Feed',     label = "Feed"),
-        dbc.Tab('Stats',    label = "Stats"),
-        dbc.Tab(tab2_content,   label = "Charts"),
+        dbc.Tab(tab2_content, label = "Feed"),
+        dbc.Tab(tab3_content, label = "Stats"),
+        dbc.Tab(tab2_content, label = "Charts"),
 ])
 
 ### APP LAYOUT ### ------------------------------------------------------------------
 app.layout = dbc.Container([
+    #Stored data
+    dcc.Store(id = 'info-store-id'),
+    dcc.Store(id = 'feed-store-id'),
     # Search Bar
     dbc.Row(dbc.Col([search_bar], width = 8, align='center'), justify="center"),
+    dbc.Row(html.Div(id = 'stock_drop')),
     html.Hr(),
     # Name And Symbol
     dbc.Row([
         dbc.Col([
-            html.H4([f"{co_data['Name']} | {co_data['Symbol']}", info], id = f"{co_id}-name"),
+            html.H4(id = "title-id"),
         ], style={'font-size': '6px'}
         ),
     ], justify="start",
@@ -158,9 +157,38 @@ app.layout = dbc.Container([
     [State("info", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
+    if not "info":
+        raise PreventUpdate
     if n1 or n2:
         return not is_open
     return is_open
+
+@app.callback(
+    Output('stock_drop', 'children'),
+    Output('info-store-id', 'data'),
+    Input('search_stock_dropdown', 'value'))
+def fun_stock_search(value):
+    if not value:
+        raise PreventUpdate
+    symbol = nasdaq[nasdaq['Name'] == value]['Symbol'].to_string().split()[1]
+    print(symbol)
+    #Get Stock Information
+    url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
+    print(url)
+    r = requests.get(url)
+    test_data = r.json()
+    print(test_data)
+    return nasdaq[nasdaq['Name'] == value]['Symbol'], test_data
+
+@app.callback(
+    Output('title-id','children'),
+    Input('info-store-id','data')
+)
+def get_data(x):
+    if not x:
+        raise PreventUpdate
+    print(f"your data: {x}")
+    return [f"{x['Name']} | {x['Symbol']}", info]
 
 # Run App --------------------------------------------
 if __name__=='__main__':
