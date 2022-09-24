@@ -89,4 +89,3 @@ search_bar = dbc.Row([
         ) 
     ], width="auto"),
 ])
-
