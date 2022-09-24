@@ -44,36 +44,36 @@ CONTENT_STYLE1 = {
 }
 SMALLCARD_STYLE = {
     "width": "12rem",
-    "padding": "0.2em",
+    "padding": "0.5em",
     "background-color": "#f8f9fa",
 }
 
 ### FUNCTIONS ### ------------------------------------------------------------------
 #create cards
-def small_card(x):
+def small_card(x,y):
     return dbc.Card(
     dbc.CardBody([
-            html.H4(className="card-title",style={'fontSize': '1em'},id = f"{x}-sc-title-id"),
-            html.H6(className="card-subtitle",style={'fontSize': '1em'},id = f"{x}-sc-sub-id"),
+            html.H4(y,className="card-title",style={'fontSize': '1em'},id = f"{y}-sc-title-id"),
+            html.H6(x[y],className="card-subtitle",style={'fontSize': '1em'},id = f"{y}-sc-sub-id"),
     ]),
     style = SMALLCARD_STYLE,
     )
 
 ### OBJECTS ### ------------------------------------------------------------------
-# Stock Description
+# Stock Description -------------
 info = html.Div([
         dbc.Button(html.I(className='fa-solid fa-info'), id="info_open", n_clicks=0),
         dbc.Modal(
             [
-                dbc.ModalHeader(id = 'description-title-id'),
-                dbc.ModalBody(id = 'description-body-id'),
+                dbc.ModalHeader(id = 'modal-info-title-id'),
+                dbc.ModalBody(id = 'modal-info-body-id'),
                 dbc.ModalFooter(
                     dbc.Button(
                         "Close", id="info_close", className="ms-auto", n_clicks=0
                     )
                 ),
             ],
-            id="info",
+            id="modal-info-id",
             is_open=False,
         ),
     ]
@@ -90,33 +90,32 @@ tab1_content = html.Div([
     html.Br(),
     dbc.Row([
         dbc.Col([
-            small_card('Exchange')
+            html.Div(id = 'country-id'),
         ]),
         dbc.Col([
-            small_card('Currency')
+            html.Div(id = 'sector-id'),
         ]),
     ], justify = 'start'),
     dbc.Row([
         dbc.Col([
-            small_card('Country')
+            html.Div(id = 'industry-id'),
         ]),
         dbc.Col([
-            small_card('Sector')
+            html.Div(),
         ])
     ]),
     dbc.Row([
         dbc.Col([
-            small_card('Industry')
+            html.Div(),
         ]),
         dbc.Col([
-
+            html.Div(),
         ])
     ]),
 ])
 tab2_content = html.Div([dcc.Graph(figure=chart)])
 tab3_content = html.Div([dcc.Graph(figure=chart)])
 tab4_content = html.Div([dcc.Graph(figure=chart)])
-
 
 # Create Tabs
 tabs = dbc.Tabs([
@@ -150,35 +149,33 @@ app.layout = dbc.Container([
     sidebar,
 ], style = CONTENT_STYLE,)
 
+
+
 ### CALLBACKS ### ------------------------------------------------------------------
 @app.callback(
-    Output("info", "is_open"),
+    Output("modal-info-id", "is_open"),
     [Input("info_open", "n_clicks"), Input("info_close", "n_clicks")],
-    [State("info", "is_open")],
+    [State("modal-info-id", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
-    if not "info":
+    if not "modal-info-id":
         raise PreventUpdate
     if n1 or n2:
         return not is_open
     return is_open
 
 @app.callback(
-    Output('stock_drop', 'children'),
     Output('info-store-id', 'data'),
     Input('search_stock_dropdown', 'value'))
 def fun_stock_search(value):
     if not value:
         raise PreventUpdate
     symbol = nasdaq[nasdaq['Name'] == value]['Symbol'].to_string().split()[1]
-    print(symbol)
     #Get Stock Information
     url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
-    print(url)
     r = requests.get(url)
     test_data = r.json()
-    print(test_data)
-    return nasdaq[nasdaq['Name'] == value]['Symbol'], test_data
+    return test_data
 
 @app.callback(
     Output('title-id','children'),
@@ -187,8 +184,27 @@ def fun_stock_search(value):
 def get_data(x):
     if not x:
         raise PreventUpdate
-    print(f"your data: {x}")
     return [f"{x['Name']} | {x['Symbol']}", info]
+
+@app.callback(
+    Output('modal-info-title-id','children'),
+    Output('modal-info-body-id','children'),
+    Input('info-store-id','data')
+)
+def get_info(x):
+    if not x:
+        raise PreventUpdate
+    return x["Name"], x["Description"]
+
+@app.callback(
+    Output('country-id','children'),
+    Output('sector-id','children'),
+    Output('industry-id','children'),
+    Input('info-store-id','data')
+)
+def get_small_cards(x):
+    return small_card(x,'Country'), small_card(x,'Sector'), small_card(x,'Industry')
+
 
 # Run App --------------------------------------------
 if __name__=='__main__':
