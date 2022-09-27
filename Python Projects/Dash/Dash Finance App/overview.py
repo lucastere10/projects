@@ -1,5 +1,6 @@
 #---------------------------------------------
 ### LIBS ###
+from contextlib import nullcontext
 from turtle import ht, width
 import dash  #pip install dash
 from dash import html, dcc, Output, Input, State, dash_table                    
@@ -53,7 +54,7 @@ SMALLCARD_STYLE = {
 def small_card(x,y):
     return dbc.Card(
     dbc.CardBody([
-            html.H4(y,className="card-title",style={'fontSize': '1em'},id = f"{y}-sc-title-id"),
+            html.H4(y,className="card-title",style={'fontSize': '.8em'},id = f"{y}-sc-title-id"),
             html.H6(x[y],className="card-subtitle",style={'fontSize': '1em'},id = f"{y}-sc-sub-id"),
     ]),
     style = SMALLCARD_STYLE,
@@ -90,7 +91,7 @@ tab1_content = html.Div([
     html.Br(),
     dbc.Row([
         dbc.Col([
-            html.Div(id = 'country-id'),
+            html.Div(id = 'industry-id'),
         ]),
         dbc.Col([
             html.Div(id = 'sector-id'),
@@ -98,7 +99,6 @@ tab1_content = html.Div([
     ], justify = 'start'),
     dbc.Row([
         dbc.Col([
-            html.Div(id = 'industry-id'),
         ]),
         dbc.Col([
             html.Div(),
@@ -152,6 +152,8 @@ app.layout = dbc.Container([
 
 
 ### CALLBACKS ### ------------------------------------------------------------------
+
+# Modal Button
 @app.callback(
     Output("modal-info-id", "is_open"),
     [Input("info_open", "n_clicks"), Input("info_close", "n_clicks")],
@@ -164,9 +166,49 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
+# Open Offcanvas Button 
+@app.callback(
+    Output("filter_offcanvas-id", "is_open"),
+    [Input("filter-button-id", "n_clicks"),Input('add-filters-button-id','n_clicks')],
+    [State("filter_offcanvas-id", "is_open")],
+)
+def toggle_offcanvas(n1, n2, is_open):
+    if not "filter_offcanvas-id":
+        raise PreventUpdate
+    if n1:
+        return not is_open
+    return is_open
+
+# Filter Dropdown Values
+@app.callback(
+    Output('search-stock-dropdown-id','options'),
+    Input('add-filters-button-id','n_clicks'),
+    State('offcanvas-filder-country-id', 'value'),
+    State('offcanvas-filder-sector-id', 'value'),
+    State('offcanvas-filder-industry-id', 'value'),
+)
+def filter_data(n_clicks, x, y, z):
+    if not n_clicks:
+        PreventUpdate
+    filtered_df = nasdaq
+    if x is not None:
+        filtered_df = filtered_df[filtered_df['Country'].isin(x)]
+    if y is not None:
+        filtered_df = filtered_df[filtered_df['Sector'].isin(y)]
+    if z is not None:
+        filtered_df = filtered_df[filtered_df['Industry'].isin(z)]
+    if len(filtered_df['Name']) == 0:
+        dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle("Not Found")),
+                dbc.ModalBody("No Stock found with those filters")
+        ], is_open = True),
+        filtered_df = nasdaq
+    print(filtered_df['Name'],type(filtered_df['Name']))
+    return filtered_df['Name'].unique()
+
 @app.callback(
     Output('info-store-id', 'data'),
-    Input('search_stock_dropdown', 'value'))
+    Input('search-stock-dropdown-id', 'value'))
 def fun_stock_search(value):
     if not value:
         raise PreventUpdate
@@ -197,14 +239,12 @@ def get_info(x):
     return x["Name"], x["Description"]
 
 @app.callback(
-    Output('country-id','children'),
     Output('sector-id','children'),
     Output('industry-id','children'),
     Input('info-store-id','data')
 )
 def get_small_cards(x):
-    return small_card(x,'Country'), small_card(x,'Sector'), small_card(x,'Industry')
-
+    return small_card(x,'Sector'), small_card(x,'Industry')
 
 # Run App --------------------------------------------
 if __name__=='__main__':
