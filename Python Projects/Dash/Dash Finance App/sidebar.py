@@ -40,16 +40,17 @@ sidebar = html.Div([
             dbc.Row([
                 dbc.Col([
                     html.H6("LOGO", className="display-4", style={'fontSize': '2rem'})
-                ], align = 'center'),
+                ],align = 'end'),
                 dbc.Col([
                     dbc.Button(html.I(
                     className = "fa-solid fa-angles-right"),
                     outline=True, 
                     color="secondary", 
                     className="mr-1", 
-                    id="btn_sidebar"
+                    id="btn_sidebar",
+                    size="sm"
                     ),
-                ], align = 'center'),
+                ]),
             ], justify = 'start'),
         html.Hr(),
         dbc.Nav([
@@ -76,9 +77,9 @@ sidebar = html.Div([
 filter = html.Div(
     [
         dbc.Button([html.I(className = "fa-solid fa-filter")],
-            color="secondary", className="ms-2", n_clicks=0,  
+            color="primary", className="ms-2", n_clicks=0,  
             style={'font-size': '12px', 'display': 'inline-block'},
-            id = 'filter-button-id'
+            id = 'filter-button-id', size="sm"
             ),
         dbc.Offcanvas([
             html.P(
@@ -106,10 +107,5 @@ search_bar = dbc.Row([
     dbc.Col([filter], width = 'auto'),
     dbc.Col([
         dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
-    ]),
-    dbc.Col([
-        dbc.Button([html.I(className = "fa-solid fa-magnifying-glass")],
-        color="primary", className="ms-2", n_clicks=0, id = 'search_stock_button'
-        ) 
-    ], width="auto"),
+    ])
 ])

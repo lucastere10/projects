@@ -16,7 +16,7 @@ import requests
 key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
 # APP --------------
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
                 suppress_callback_exceptions=True,
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
@@ -44,8 +44,8 @@ CONTENT_STYLE1 = {
     "background-color": "#f8f9fa",
 }
 SMALLCARD_STYLE = {
-    "width": "12rem",
-    "padding": "0.5em",
+    "width": "16rem",
+    "padding": "0.8em",
     "background-color": "#f8f9fa",
 }
 
@@ -60,10 +60,26 @@ def small_card(x,y):
     style = SMALLCARD_STYLE,
     )
 
+#feeds
+def create_feed(x,title,summary,url,s_label):
+    return html.Div(
+        dbc.Container([
+            html.P(x[title] ,id=f'{title}-feed-title-id', className="lead"),
+            dbc.Badge(x[s_label], color="primary", id=f'{title}-feed-badge-id',className="me-1"),
+            html.Hr(className="my-2"),
+            html.P(x[summary] ,id = f'{title}-feed-sumary-id'),
+            html.P(x[url] ,id = f'{title}-feed-url-id'),
+            ],
+            fluid=True,
+            className="py-3",
+        ),
+        className="p-3 bg-light rounded-3",
+    )
+
 ### OBJECTS ### ------------------------------------------------------------------
 # Stock Description -------------
 info = html.Div([
-        dbc.Button(html.I(className='fa-solid fa-info'), id="info_open", n_clicks=0),
+        dbc.Button(html.I(className='fa-solid fa-info'), id="info_open", n_clicks=0, className="btn btn-primary btn-sm"),
         dbc.Modal(
             [
                 dbc.ModalHeader(id = 'modal-info-title-id'),
@@ -76,10 +92,10 @@ info = html.Div([
             ],
             id="modal-info-id",
             is_open=False,
-        ),
-    ]
-)
+        )
+    ])
 
+#stock chart
 chart = go.Figure(data=[go.Candlestick(x=df['date'],
                 open  = df[df['indicator'] == 'open'],
                 high  = df[df['indicator'] == 'high'],
@@ -99,22 +115,40 @@ tab1_content = html.Div([
     ], justify = 'start'),
     dbc.Row([
         dbc.Col([
+            html.Div(id = 'DividendPerShare-id'),
         ]),
         dbc.Col([
-            html.Div(),
-        ])
-    ]),
+            html.Div(id = 'DividendYield-id'),
+        ]),
+    ], justify = 'start'),
     dbc.Row([
         dbc.Col([
-            html.Div(),
+            html.Div(id = 'PERatio-id'),
         ]),
         dbc.Col([
-            html.Div(),
-        ])
-    ]),
+            html.Div(id = 'PEGRatio-id'),
+        ]),
+    ], justify = 'start'),
 ])
-tab2_content = html.Div([dcc.Graph(figure=chart)])
-tab3_content = html.Div([dcc.Graph(figure=chart)])
+tab2_content = html.Div([
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = 'feed-1-id'),
+        ]),
+    ], justify = 'start'),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = 'feed-2-id'),
+        ]),
+    ], justify = 'start'),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = 'feed-3-id'),
+        ]),
+    ], justify = 'start'),
+])
+tab3_content = html.Div([])
 tab4_content = html.Div([dcc.Graph(figure=chart)])
 
 # Create Tabs
@@ -122,27 +156,29 @@ tabs = dbc.Tabs([
         dbc.Tab(tab1_content, label = "Overview"),
         dbc.Tab(tab2_content, label = "Feed"),
         dbc.Tab(tab3_content, label = "Stats"),
-        dbc.Tab(tab2_content, label = "Charts"),
+        dbc.Tab(tab4_content, label = "Charts"), 
 ])
 
 ### APP LAYOUT ### ------------------------------------------------------------------
+
 app.layout = dbc.Container([
     #Stored data
     dcc.Store(id = 'info-store-id'),
     dcc.Store(id = 'feed-store-id'),
     # Search Bar
-    dbc.Row(dbc.Col([search_bar], width = 8, align='center'), justify="center"),
-    dbc.Row(html.Div(id = 'stock_drop')),
+    dbc.Row(dbc.Col([search_bar], width = 10, align='center'), justify="center"),
     html.Hr(),
-    # Name And Symbol
+    # Name And Symbol | Description
     dbc.Row([
         dbc.Col([
             html.H4(id = "title-id"),
-        ], style={'font-size': '6px'}
+        ], align='center' ,style={'font-size': '6px'}
         ),
+        dbc.Col([
+            html.Div(id = 'description-id')
+        ],  align='center')
     ], justify="start",
     ),
-    html.Br(),
     dbc.Row([
         tabs
     ]),
@@ -150,9 +186,7 @@ app.layout = dbc.Container([
 ], style = CONTENT_STYLE,)
 
 
-
 ### CALLBACKS ### ------------------------------------------------------------------
-
 # Modal Button
 @app.callback(
     Output("modal-info-id", "is_open"),
@@ -203,31 +237,39 @@ def filter_data(n_clicks, x, y, z):
                 dbc.ModalBody("No Stock found with those filters")
         ], is_open = True),
         filtered_df = nasdaq
-    print(filtered_df['Name'],type(filtered_df['Name']))
     return filtered_df['Name'].unique()
 
+#get stock tickers and data
 @app.callback(
     Output('info-store-id', 'data'),
+    Output('feed-store-id', 'data'),
     Input('search-stock-dropdown-id', 'value'))
 def fun_stock_search(value):
     if not value:
         raise PreventUpdate
     symbol = nasdaq[nasdaq['Name'] == value]['Symbol'].to_string().split()[1]
     #Get Stock Information
-    url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
-    r = requests.get(url)
-    test_data = r.json()
-    return test_data
+    stock_url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={key}'
+    r = requests.get(stock_url)
+    stock_data = r.json()
+    #Get Stock Feed
+    feed_url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={key}'
+    f = requests.get(feed_url)
+    feed_data = f.json()
+    return stock_data, feed_data
 
+#Get Stock Title and Symbol
 @app.callback(
     Output('title-id','children'),
+    Output('description-id','children'),
     Input('info-store-id','data')
 )
 def get_data(x):
     if not x:
         raise PreventUpdate
-    return [f"{x['Name']} | {x['Symbol']}", info]
+    return [f"{x['Name']} | {x['Symbol']}"], info
 
+#get Stock description
 @app.callback(
     Output('modal-info-title-id','children'),
     Output('modal-info-body-id','children'),
@@ -238,13 +280,35 @@ def get_info(x):
         raise PreventUpdate
     return x["Name"], x["Description"]
 
+#Get Stock overwiew information
 @app.callback(
     Output('sector-id','children'),
     Output('industry-id','children'),
+    Output('DividendPerShare-id','children'),
+    Output('DividendYield-id','children'),
+    Output('PERatio-id','children'),
+    Output('PEGRatio-id','children'),    
     Input('info-store-id','data')
 )
 def get_small_cards(x):
-    return small_card(x,'Sector'), small_card(x,'Industry')
+    return [small_card(x,'Sector'), 
+            small_card(x,'Industry'),
+            small_card(x,'DividendPerShare'), 
+            small_card(x,'DividendYield'), 
+            small_card(x,'PERatio'), 
+            small_card(x,'PEGRatio')]
+
+#Get Stock feed information
+@app.callback(
+    Output('feed-1-id','children'),
+    Input('feed-store-id','data')
+)
+def get_feed(x):
+    if not x:
+        PreventUpdate
+    if not x['feed']:
+        PreventUpdate
+    return create_feed(x['feed'][0],'title','summary','url','overall_sentiment_label')
 
 # Run App --------------------------------------------
 if __name__=='__main__':
