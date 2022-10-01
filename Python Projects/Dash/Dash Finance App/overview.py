@@ -61,20 +61,18 @@ def small_card(x,y):
     )
 
 #feeds
-def create_feed(x,title,summary,url,s_label):
-    return html.Div(
-        dbc.Container([
-            html.P(x[title] ,id=f'{title}-feed-title-id', className="lead"),
-            dbc.Badge(x[s_label], color="primary", id=f'{title}-feed-badge-id',className="me-1"),
-            html.Hr(className="my-2"),
-            html.P(x[summary] ,id = f'{title}-feed-sumary-id'),
-            html.P(x[url] ,id = f'{title}-feed-url-id'),
-            ],
-            fluid=True,
-            className="py-3",
-        ),
-        className="p-3 bg-light rounded-3",
-    )
+def create_feed(x,title,summary,url,s_label,score):
+    return dbc.Container([
+                dcc.Link([
+                    html.P(x[title] ,id=f'{x[title]}-feed-title-id', className="lead")
+                ],  href = x[url], target="_blank", style={'font-weight': 'bold'}
+                ),
+                dbc.Badge(x[s_label], color="primary", id=f'{x[title]}-feed-badge-id',className="me-1"),
+                html.Hr(className="my-2"),
+                html.P(x[summary] ,id = f'{title}-feed-sumary-id'),
+                dbc.Tooltip(f"Score = {x[score]}", target = f'{x[title]}-feed-badge-id', placement = 'right'),
+            ], fluid=True, className="py-3")
+            
 
 ### OBJECTS ### ------------------------------------------------------------------
 # Stock Description -------------
@@ -97,10 +95,10 @@ info = html.Div([
 
 #stock chart
 chart = go.Figure(data=[go.Candlestick(x=df['date'],
-                open  = df[df['indicator'] == 'open'],
-                high  = df[df['indicator'] == 'high'],
-                low   = df[df['indicator'] == 'low'],
-                close = df[df['indicator'] == 'close'])])
+                open  = df[df['indicator'] == 'open']['rate'],
+                high  = df[df['indicator'] == 'high']['rate'],
+                low   = df[df['indicator'] == 'low']['rate'],
+                close = df[df['indicator'] == 'close']['rate'])])
 
 # Tabs Content
 tab1_content = html.Div([
@@ -132,24 +130,11 @@ tab1_content = html.Div([
 ])
 tab2_content = html.Div([
     html.Br(),
-    dbc.Row([
-        dbc.Col([
-            html.Div(id = 'feed-1-id'),
-        ]),
-    ], justify = 'start'),
-    dbc.Row([
-        dbc.Col([
-            html.Div(id = 'feed-2-id'),
-        ]),
-    ], justify = 'start'),
-    dbc.Row([
-        dbc.Col([
-            html.Div(id = 'feed-3-id'),
-        ]),
-    ], justify = 'start'),
+    dbc.Container(id = 'tab2-nfeed-id'),
+    dbc.Container(id = 'tab2-content-id'),
 ])
 tab3_content = html.Div([])
-tab4_content = html.Div([dcc.Graph(figure=chart)])
+tab4_content = html.Div([dcc.Graph(figure = chart)])
 
 # Create Tabs
 tabs = dbc.Tabs([
@@ -300,15 +285,15 @@ def get_small_cards(x):
 
 #Get Stock feed information
 @app.callback(
-    Output('feed-1-id','children'),
+    Output('tab2-content-id','children'),
     Input('feed-store-id','data')
 )
 def get_feed(x):
-    if not x:
+    if not x or not x['feed']:
         PreventUpdate
-    if not x['feed']:
-        PreventUpdate
-    return create_feed(x['feed'][0],'title','summary','url','overall_sentiment_label')
+    return dbc.Row(children = [create_feed(x['feed'][n],'title', 'summary','url',
+                        'overall_sentiment_label','overall_sentiment_score') for n in range(0,int(x['items']))
+                    ])
 
 # Run App --------------------------------------------
 if __name__=='__main__':
