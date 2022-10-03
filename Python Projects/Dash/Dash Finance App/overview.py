@@ -22,9 +22,6 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
 
-# Get Data ---------
-df = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\ttm.csv')
-df['date'] = pd.to_datetime(df["date"])
 #Stocks Tickters
 nasdaq = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\nasdaq.csv')
 
@@ -44,8 +41,8 @@ CONTENT_STYLE1 = {
     "background-color": "#f8f9fa",
 }
 SMALLCARD_STYLE = {
-    "width": "16rem",
-    "padding": "0.8em",
+    "width": "18rem",
+    "padding": "0.3em",
     "background-color": "#f8f9fa",
 }
 
@@ -54,8 +51,8 @@ SMALLCARD_STYLE = {
 def small_card(x,y):
     return dbc.Card(
     dbc.CardBody([
-            html.H4(y,className="card-title",style={'fontSize': '.8em'},id = f"{y}-sc-title-id"),
-            html.H6(x[y],className="card-subtitle",style={'fontSize': '1em'},id = f"{y}-sc-sub-id"),
+            html.H4(y,className="card-title",style={'fontSize': '.7em'},id = f"{y}-sc-title-id"),
+            html.H6(x[y],className="card-subtitle",style={'fontSize': '1em', 'font-weight': 'bold'},id = f"{y}-sc-sub-id"),
     ]),
     style = SMALLCARD_STYLE,
     )
@@ -93,13 +90,6 @@ info = html.Div([
         )
     ])
 
-#stock chart
-chart = go.Figure(data=[go.Candlestick(x=df['date'],
-                open  = df[df['indicator'] == 'open']['rate'],
-                high  = df[df['indicator'] == 'high']['rate'],
-                low   = df[df['indicator'] == 'low']['rate'],
-                close = df[df['indicator'] == 'close']['rate'])])
-
 # Tabs Content
 tab1_content = html.Div([
     html.Br(),
@@ -111,20 +101,22 @@ tab1_content = html.Div([
             html.Div(id = 'sector-id'),
         ]),
     ], justify = 'start'),
+    html.Br(),
     dbc.Row([
         dbc.Col([
-            html.Div(id = 'DividendPerShare-id'),
+            html.Div(id = 'RevenuePerShareTTM-id'),
         ]),
         dbc.Col([
-            html.Div(id = 'DividendYield-id'),
+            html.Div(id = 'OperatingMarginTTM-id'),
         ]),
     ], justify = 'start'),
+    html.Br(),
     dbc.Row([
         dbc.Col([
-            html.Div(id = 'PERatio-id'),
+            html.Div(id = 'ReturnOnAssetsTTM-id'),
         ]),
         dbc.Col([
-            html.Div(id = 'PEGRatio-id'),
+            html.Div(id = 'ReturnOnEquityTTM-id'),
         ]),
     ], justify = 'start'),
 ])
@@ -133,8 +125,46 @@ tab2_content = html.Div([
     dbc.Container(id = 'tab2-nfeed-id'),
     dbc.Container(id = 'tab2-content-id'),
 ])
-tab3_content = html.Div([])
-tab4_content = html.Div([dcc.Graph(figure = chart)])
+tab3_content = html.Div([
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = 'PERatio-id'),
+        ]),
+        dbc.Col([
+            html.Div(id = 'PEGRatio-id'),
+        ]),
+    ], justify = 'start'),
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = 'DividendPerShare-id'),
+        ]),
+        dbc.Col([
+            html.Div(id = 'DividendYield-id'),
+        ]),
+    ], justify = 'start'),
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = '52WeekHigh-id'),
+        ]),
+        dbc.Col([
+            html.Div(id = '52WeekLow-id'),
+        ]),
+    ], justify = 'start'), 
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            html.Div(id = "50DayMovingAverage-id"),
+        ]),
+        dbc.Col([
+            html.Div(id = "200DayMovingAverage-id"),
+        ]),
+    ], justify = 'start'),
+    html.Br(),     
+])
+tab4_content = html.Div([dcc.Graph('chart-id')])
 
 # Create Tabs
 tabs = dbc.Tabs([
@@ -150,6 +180,7 @@ app.layout = dbc.Container([
     #Stored data
     dcc.Store(id = 'info-store-id'),
     dcc.Store(id = 'feed-store-id'),
+    dcc.Store(id = 'chart-store-id'),
     # Search Bar
     dbc.Row(dbc.Col([search_bar], width = 10, align='center'), justify="center"),
     html.Hr(),
@@ -226,8 +257,9 @@ def filter_data(n_clicks, x, y, z):
 
 #get stock tickers and data
 @app.callback(
-    Output('info-store-id', 'data'),
-    Output('feed-store-id', 'data'),
+    Output('info-store-id',  'data'),
+    Output('feed-store-id',  'data'),
+    Output('chart-store-id', 'data'),
     Input('search-stock-dropdown-id', 'value'))
 def fun_stock_search(value):
     if not value:
@@ -241,7 +273,13 @@ def fun_stock_search(value):
     feed_url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={key}'
     f = requests.get(feed_url)
     feed_data = f.json()
-    return stock_data, feed_data
+    #Get Stock Chart
+    chart_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={key}'
+    c = requests.get(chart_url)
+    chart_data = c.json()
+    print(chart_data)
+    return stock_data, feed_data, chart_data
+
 
 #Get Stock Title and Symbol
 @app.callback(
@@ -267,21 +305,35 @@ def get_info(x):
 
 #Get Stock overwiew information
 @app.callback(
+    #tab1-content
     Output('sector-id','children'),
     Output('industry-id','children'),
-    Output('DividendPerShare-id','children'),
-    Output('DividendYield-id','children'),
+    Output('RevenuePerShareTTM-id','children'),
+    Output('OperatingMarginTTM-id','children'),
+    Output('ReturnOnAssetsTTM-id','children'),
+    Output('ReturnOnEquityTTM-id','children'),
+    #tab2-content
     Output('PERatio-id','children'),
     Output('PEGRatio-id','children'),    
+    Output('DividendPerShare-id','children'),
+    Output('DividendYield-id','children'),
+    Output('52WeekHigh-id','children'),
+    Output('52WeekLow-id','children'),
+    Output('50DayMovingAverage-id','children'),
+    Output('200DayMovingAverage-id','children'),
+    #inputs
     Input('info-store-id','data')
 )
 def get_small_cards(x):
-    return [small_card(x,'Sector'), 
-            small_card(x,'Industry'),
-            small_card(x,'DividendPerShare'), 
-            small_card(x,'DividendYield'), 
-            small_card(x,'PERatio'), 
-            small_card(x,'PEGRatio')]
+    return [#tab1 content
+            small_card(x,'Sector'), small_card(x,'Industry'),
+            small_card(x,'RevenuePerShareTTM'), small_card(x,'OperatingMarginTTM'),
+            small_card(x, 'ReturnOnAssetsTTM'), small_card(x, 'ReturnOnEquityTTM'),
+            #tab2 content
+            small_card(x,'PERatio'), small_card(x,'PEGRatio'),
+            small_card(x,'DividendPerShare'), small_card(x,'DividendYield'),
+            small_card(x,'52WeekHigh'), small_card(x,'52WeekLow'),
+            small_card(x,'50DayMovingAverage'), small_card(x,'200DayMovingAverage'),]
 
 #Get Stock feed information
 @app.callback(
@@ -295,6 +347,24 @@ def get_feed(x):
                         'overall_sentiment_label','overall_sentiment_score') for n in range(0,int(x['items']))
                     ])
 
+#Create Chart
+@app.callback(
+    Output('chart-id','figure'),
+    Input('chart-store-id','data'),
+)
+def get_chart(x):
+    chart_data = pd.DataFrame.from_dict(x['Time Series (5min)'], orient = 'index').reset_index()
+    chart_data['index'] = pd.to_datetime(chart_data['index'])
+    print(chart_data)
+    print(type(chart_data))
+    #create chart fig
+    fig = go.Figure(data=[go.Candlestick(x=chart_data['index'],
+                    open  = chart_data['1. open'],
+                    high  = chart_data['2. high'],
+                    low   = chart_data['3. low'],
+                    close = chart_data['4. close'])
+                    ])
+    return fig
 # Run App --------------------------------------------
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)
