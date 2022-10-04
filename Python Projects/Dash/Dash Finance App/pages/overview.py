@@ -10,7 +10,6 @@ from dash.exceptions import PreventUpdate
 import pandas as pd 
 import plotly.express as px
 import plotly.graph_objects as go
-from create_card import create_card
 from sidebar import sidebar, search_bar
 import requests
 key = '1D0MB8E05Q6QOL2L' #Alpha API Key
