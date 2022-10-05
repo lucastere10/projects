@@ -3,73 +3,54 @@ from dash import dcc, html, State, Input, Output
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import dash_daq as daq                     # pip install dash_daq
 import pandas as pd
+from dash.exceptions import PreventUpdate
+from styles.styles import SIDEBAR_HIDEN, SIDEBAR_STYLE, CONTENT_STYLE, CONTENT_STYLE1
 
 nasdaq = pd.read_csv('Python Projects\\Dash\\Dash Finance App\\data\\nasdaq.csv')
 
-### STYLES ### ------------------------------------------------------------------
-# Sidebar Style ------------
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "14rem",
-    "height": "100%",
-    "z-index": 1,
-    "overflow-x": "hidden",
-    "transition": "all 0.5s",
-    "padding": "0.5rem 1rem", #"padding": "4rem 1rem 2rem",
-    "background-color": "#f8f9fa",
-}
-SIDEBAR_HIDEN = {
-    "position": "fixed",
-    "top": 0,
-    "left": "-14rem",
-    "bottom": 0,
-    "width": "14rem",
-    "height": "100%",
-    "z-index": 1,
-    "overflow-x": "hidden",
-    "transition": "all 0.5s",
-    "padding": "0rem 0rem",
-    "background-color": "#f8f9fa",
-}       
-
 # Sidebar ------------------------------
 sidebar = html.Div([
+            dcc.Store(id='side-click'),
             dbc.Row([
                 dbc.Col([
-                    html.H6("LOGO", className="display-4", style={'fontSize': '2rem'})
+                    html.H6("LOGO", className="display-4", style={'fontSize': '2rem'}, id = 'logo-id')
                 ],align = 'end'),
                 dbc.Col([
-                    dbc.Button(html.I(
-                    className = "fa-solid fa-angles-right"),
+                    dbc.Button(
+                    html.I(className = "fa-solid fa-angles-right", id = "btn-sidebar-icon-id"),
                     outline=True, 
                     color="secondary", 
                     className="mr-1", 
-                    id="btn_sidebar",
+                    id="btn-sidebar-id",
                     size="sm"
                     ),
                 ]),
             ], justify = 'start'),
         html.Hr(),
         dbc.Nav([
-                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], href="/", active="exact"),                
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], 
+                            href="/", active="exact", id = 'home-id'),                
                 html.Hr(),
-                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], href="/stocks", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], href="/crypto", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Overview"], href="/overview", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], 
+                            href="/stocks", active="exact", id = 'stocks-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], 
+                            href="/crypto", active="exact", id = 'crypto-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Overview"], 
+                            href="/overview", active="exact", id = 'overview-id'),
                 #dbc.NavLink([html.I(className = "fa-solid fa-solid fa-money-bill-trend-up"), "  Trade Markets"], href="/markets", active="exact"),
                 html.Hr(),
-                dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], href="/portfolio", active="exact"),
-                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], href="/contact", active="exact"),
+                dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], 
+                            href="/portfolio", active="exact", id = 'portfolio-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], 
+                            href="/contact", active="exact", id = 'contact-id'),
                 html.Hr(),
-                daq.ToggleSwitch(id='my-toggle-switch',value=False),
+                html.Br(),
+                daq.ToggleSwitch(id='toggle-switch-id',value=False),
             ],
             vertical=True,
             pills=True,
         ),            
-    ], style=SIDEBAR_STYLE,  id="sidebar",
+    ], style=SIDEBAR_STYLE,  id="sidebar-id",
 )
 
 # navbar -------------
@@ -108,3 +89,130 @@ search_bar = dbc.Row([
         dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
     ])
 ])
+
+#sidebar colapse
+def callback_sidebar_collapse(app):
+    @app.callback(
+        [   #layout
+            Output("sidebar-id", "style"),
+            Output("layout-id", "style"),
+            Output("side-click", "data"),
+            #orientation
+            Output("btn-sidebar-icon-id",'className'),
+            #logo
+            Output('logo-id','hidden'),
+            #icons
+            Output('home-id','children'),
+            Output('stocks-id','children'),
+            Output('crypto-id','children'),
+            Output('overview-id','children'),
+            Output('portfolio-id','children'),
+            Output('contact-id','children'),
+            #Toggle Switch        
+            Output('toggle-switch-id','vertical')
+        ],
+        [   Input("btn-sidebar-id", "n_clicks")],
+        [   State("side-click", "data"),
+        ]
+    )
+    def toggle_sidebar(n, nclick):
+        if n:
+            if nclick == "SHOW":
+                #layout
+                sidebar_style = SIDEBAR_HIDEN
+                content_style = CONTENT_STYLE1
+                cur_nclick = "HIDDEN"   
+                #orientation  
+                icon_orientation = "fa-solid fa-angles-left"
+                #logo
+                logo_hidden = True    
+                #icons
+                icon_home = [html.I(className = "fa-solid fa-house")]
+                icon_stocks = [html.I(className = "fa-solid fa-chart-bar")]
+                icon_crypto = [html.I(className = "fa-solid fa-coins")]
+                icon_overview = [html.I(className = "fa-solid fa-eye")]
+                icon_portfolio = [html.I(className = "fa-solid fa-user")]
+                icon_contact =  [html.I(className = "fa-solid fa-envelope")]          
+                #toggle
+                toggle_vertical = True
+            else:
+                #layout    
+                sidebar_style = SIDEBAR_STYLE
+                content_style = CONTENT_STYLE
+                cur_nclick = "SHOW"
+                #orientation 
+                icon_orientation = "fa-solid fa-angles-right"
+                #logo
+                logo_hidden = False
+                #icons
+                icon_home = [html.I(className = "fa-solid fa-house"), "  Home"]
+                icon_stocks = [html.I(className = "fa-solid fa-chart-bar"), "  Stocks"]
+                icon_crypto = [html.I(className = "fa-solid fa-coins"), "  Crypto"]
+                icon_overview = [html.I(className = "fa-solid fa-eye"), "  Overview"]
+                icon_portfolio = [html.I(className = "fa-solid fa-user"), "  My Portfolio"]
+                icon_contact =  [html.I(className = "fa-solid fa-envelope"), "  Contact"]
+                #toggle
+                toggle_vertical = False
+        else:
+            #layout
+            sidebar_style = SIDEBAR_STYLE
+            content_style = CONTENT_STYLE
+            cur_nclick = "SHOW"
+            #orientation 
+            icon_orientation = "fa-solid fa-angles-right"
+            #logo
+            logo_hidden = False
+            #icons        
+            icon_home = [html.I(className = "fa-solid fa-house"), "  Home"]
+            icon_stocks = [html.I(className = "fa-solid fa-chart-bar"), "  Stocks"]
+            icon_crypto = [html.I(className = "fa-solid fa-coins"), "  Crypto"]
+            icon_overview = [html.I(className = "fa-solid fa-eye"), "  Overview"]
+            icon_portfolio = [html.I(className = "fa-solid fa-user"), "  My Portfolio"]
+            icon_contact =  [html.I(className = "fa-solid fa-envelope"), "  Contact"]
+            #toggle
+            toggle_vertical = False
+        return [sidebar_style, content_style, cur_nclick,
+                icon_orientation, logo_hidden,
+                icon_home, icon_stocks, icon_crypto, icon_overview, icon_portfolio, icon_contact,
+                toggle_vertical,]
+
+# Open Offcanvas Button 
+def callback_open_offcanvas(app):
+    @app.callback(
+        Output("filter_offcanvas-id", "is_open"),
+        [Input("filter-button-id", "n_clicks"),Input('add-filters-button-id','n_clicks')],
+        [State("filter_offcanvas-id", "is_open")],
+    )
+    def toggle_offcanvas(n1, n2, is_open):
+        if not "filter_offcanvas-id":
+            raise PreventUpdate
+        if n1:
+            return not is_open
+        return is_open
+
+# Filter Dropdown Values
+def callback_filter_dropdown(app):
+    @app.callback(
+        Output('search-stock-dropdown-id','options'),
+        Input('add-filters-button-id','n_clicks'),
+        State('offcanvas-filder-country-id', 'value'),
+        State('offcanvas-filder-sector-id', 'value'),
+        State('offcanvas-filder-industry-id', 'value'),
+    )
+    def filter_data(n_clicks, x, y, z):
+        if not n_clicks:
+            PreventUpdate
+        filtered_df = nasdaq
+        if x is not None:
+            filtered_df = filtered_df[filtered_df['Country'].isin(x)]
+        if y is not None:
+            filtered_df = filtered_df[filtered_df['Sector'].isin(y)]
+        if z is not None:
+            filtered_df = filtered_df[filtered_df['Industry'].isin(z)]
+        if len(filtered_df['Name']) == 0:
+            dbc.Modal([
+                    dbc.ModalHeader(dbc.ModalTitle("Not Found")),
+                    dbc.ModalBody("No Stock found with those filters")
+            ], is_open = True),
+            filtered_df = nasdaq
+        return filtered_df['Name'].unique()
