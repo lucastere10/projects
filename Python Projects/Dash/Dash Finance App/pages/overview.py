@@ -8,9 +8,10 @@ import dash_bootstrap_components as dbc    # pip install dash-bootstrap-componen
 import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
 import pandas as pd 
-import plotly.express as px
 import plotly.graph_objects as go
-from sidebar import sidebar, search_bar
+from sidebar import sidebar, search_bar, callback_sidebar_collapse, callback_open_offcanvas , callback_filter_dropdown
+from styles.styles import SIDEBAR_STYLE, SIDEBAR_HIDEN, CONTENT_STYLE, CONTENT_STYLE1, SMALLCARD_STYLE
+
 import requests
 key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
@@ -23,27 +24,6 @@ app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_
 
 #Stocks Tickters
 nasdaq = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\nasdaq.csv')
-
-### STYLES ### ------------------------------------------------------------------
-# Content Style ------------
-CONTENT_STYLE = {
-    "margin-left": "15rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
-}
-CONTENT_STYLE1 = {
-    "transition": "margin-left .5s",
-    "margin-left": "2rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
-}
-SMALLCARD_STYLE = {
-    "width": "18rem",
-    "padding": "0.3em",
-    "background-color": "#f8f9fa",
-}
 
 ### FUNCTIONS ### ------------------------------------------------------------------
 #create cards
@@ -198,7 +178,7 @@ app.layout = dbc.Container([
         tabs
     ]),
     sidebar,
-], style = CONTENT_STYLE,)
+], style = CONTENT_STYLE, id = 'layout-id' )
 
 
 ### CALLBACKS ### ------------------------------------------------------------------
@@ -216,43 +196,10 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 # Open Offcanvas Button 
-@app.callback(
-    Output("filter_offcanvas-id", "is_open"),
-    [Input("filter-button-id", "n_clicks"),Input('add-filters-button-id','n_clicks')],
-    [State("filter_offcanvas-id", "is_open")],
-)
-def toggle_offcanvas(n1, n2, is_open):
-    if not "filter_offcanvas-id":
-        raise PreventUpdate
-    if n1:
-        return not is_open
-    return is_open
+callback_open_offcanvas(app)
 
 # Filter Dropdown Values
-@app.callback(
-    Output('search-stock-dropdown-id','options'),
-    Input('add-filters-button-id','n_clicks'),
-    State('offcanvas-filder-country-id', 'value'),
-    State('offcanvas-filder-sector-id', 'value'),
-    State('offcanvas-filder-industry-id', 'value'),
-)
-def filter_data(n_clicks, x, y, z):
-    if not n_clicks:
-        PreventUpdate
-    filtered_df = nasdaq
-    if x is not None:
-        filtered_df = filtered_df[filtered_df['Country'].isin(x)]
-    if y is not None:
-        filtered_df = filtered_df[filtered_df['Sector'].isin(y)]
-    if z is not None:
-        filtered_df = filtered_df[filtered_df['Industry'].isin(z)]
-    if len(filtered_df['Name']) == 0:
-        dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle("Not Found")),
-                dbc.ModalBody("No Stock found with those filters")
-        ], is_open = True),
-        filtered_df = nasdaq
-    return filtered_df['Name'].unique()
+callback_filter_dropdown(app)
 
 #get stock tickers and data
 @app.callback(
@@ -276,7 +223,6 @@ def fun_stock_search(value):
     chart_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={key}'
     c = requests.get(chart_url)
     chart_data = c.json()
-    print(chart_data)
     return stock_data, feed_data, chart_data
 
 
@@ -354,8 +300,6 @@ def get_feed(x):
 def get_chart(x):
     chart_data = pd.DataFrame.from_dict(x['Time Series (5min)'], orient = 'index').reset_index()
     chart_data['index'] = pd.to_datetime(chart_data['index'])
-    print(chart_data)
-    print(type(chart_data))
     #create chart fig
     fig = go.Figure(data=[go.Candlestick(x=chart_data['index'],
                     open  = chart_data['1. open'],
@@ -364,6 +308,9 @@ def get_chart(x):
                     close = chart_data['4. close'])
                     ])
     return fig
+
+callback_sidebar_collapse(app)
+
 # Run App --------------------------------------------
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)
