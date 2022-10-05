@@ -7,12 +7,11 @@ import dash_bootstrap_components as dbc    # pip install dash-bootstrap-componen
 import dash_daq as daq                     # pip install dash_daq
 import plotly.express as px
 import plotly.graph_objects as go
-from pages.create_card import create_card
-from pages.sidebar import sidebar, search_bar
-from pages import overview
+from create_card import create_card
+from sidebar import sidebar, search_bar
 
 # APP --------------
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.FLATLY, dbc.icons.FONT_AWESOME],
+app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
@@ -38,9 +37,9 @@ app.layout = dbc.Container([
     dbc.Row(dbc.Col([search_bar], width = 10, align='center'), justify="center"),
     html.Br(),
     dbc.Row([
-        dbc.Col([html.Div(create_card('PBR', 'Petrobrás'))]),
-        dbc.Col([html.Div(create_card('BRT', 'Veículos RJ'))]),
-        dbc.Col([html.Div(create_card('TSL', 'Tesla Motors'))]),
+        dbc.Col([html.Div(create_card('PBR'))]),
+        dbc.Col([html.Div(create_card('AAPL'))]),
+        dbc.Col([html.Div(create_card('AMZN'))]),
     ]),
     html.Br(),
     sidebar,

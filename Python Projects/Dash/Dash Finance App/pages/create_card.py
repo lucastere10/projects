@@ -1,21 +1,24 @@
 from dash import dcc, html, State, Input, Output
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
+import yfinance as yf
 
 # card ---------------
-def create_card(card_id, title):  
+def create_card(ticker):  
+    df = yf.Ticker(ticker)
+    info = df.info
     return dbc.Card([
             dbc.Row([
                 dbc.Col([
                     dbc.CardImg(
-                        src = 'assets/unnamed.png',
+                        src = info['logo_url'],
                         top = 'False',
                         style = {"width":'4rem', "padding": "0.5rem 0.5rem"},
                         class_name = "rounded-circle",
                     ),
                 ], width = 2),
                 dbc.Col([
-                    dbc.Row([html.H4(title, id = f"{card_id}-title")], style={'font-size': '6px'}),
-                    dbc.Row([html.P(card_id, id = f'{card_id}-id')], style={'font-size': '16px'}),
+                    dbc.Row([html.H4(info['shortName'], id = f"{ticker}-title")], style={'font-size': '6px'}),
+                    dbc.Row([html.P(info['symbol'], id = f'{ticker}-id')], style={'font-size': '16px'}),
                 ], width = 10),
             ]),
             dbc.CardBody([

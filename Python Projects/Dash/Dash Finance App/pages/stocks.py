@@ -10,8 +10,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from alpha_vantage.timeseries import TimeSeries # pip install alpha-vantage
 
-dash.register_page(__name__, path='/stocks')
-
 layout = html.Div(children=[
     html.H1(children='This is our Stocks page'),
 	html.Div([
