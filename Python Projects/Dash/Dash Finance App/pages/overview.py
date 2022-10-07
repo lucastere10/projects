@@ -164,6 +164,10 @@ app.layout = dbc.Container([
     dbc.Row(dbc.Col([search_bar], width = 10, align='center'), justify="center"),
     html.Hr(),
     # Name And Symbol | Description
+    dcc.Loading(
+        id="loading-id", type="default", color = '#1a1a1a',
+        children=html.Div(id="loading-output-id"), fullscreen = True
+    ),
     dbc.Row([
         dbc.Col([
             html.H4(id = "title-id"),
@@ -206,6 +210,7 @@ callback_filter_dropdown(app)
     Output('info-store-id',  'data'),
     Output('feed-store-id',  'data'),
     Output('chart-store-id', 'data'),
+    Output('loading-output-id','children'),
     Input('search-stock-dropdown-id', 'value'))
 def fun_stock_search(value):
     if not value:
@@ -223,7 +228,7 @@ def fun_stock_search(value):
     chart_url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={key}'
     c = requests.get(chart_url)
     chart_data = c.json()
-    return stock_data, feed_data, chart_data
+    return stock_data, feed_data, chart_data, {}
 
 
 #Get Stock Title and Symbol
