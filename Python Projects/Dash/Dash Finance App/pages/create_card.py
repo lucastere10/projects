@@ -1,6 +1,7 @@
 from dash import dcc, html, State, Input, Output
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import yfinance as yf
+import plotly.express as px
 import plotly.graph_objects as go
 from sidebar import nasdaq
 
@@ -16,6 +17,9 @@ def create_card(ticker):
         if bool(hist.empty) is False:
             print('agora deu bom')
             break
+    #make indicators
+    day_start = hist[hist['Datetime'] == hist['Datetime'].min()]['Close'].values[0]
+    day_end = hist[hist['Datetime'] == hist['Datetime'].max()]['Close'].values[0]
     fig = go.Figure(data=[go.Candlestick(x=hist['Datetime'],
                     open  = hist['Open'],
                     high  = hist['High'],
@@ -36,46 +40,74 @@ def create_card(ticker):
                     ),
                 ], width = 3),
                 dbc.Col([
-                    dbc.Row([html.H4(info['shortName'], id = f"{ticker}-title")], style={'font-size': '6px'}),
-                    dbc.Row([html.P(info['symbol'], id = f'{ticker}-id')], style={'font-size': '16px'}),
+                    dbc.Row([html.P(info['shortName'], id = f"{ticker}-title")], style={'font-size': '16px'}),
+                    dbc.Row([html.H4(info['symbol'], id = f'{ticker}-id')], style={'font-size': '1px', 'font-weight' : 'bold'}),
                 ], width = 9),
             ]),
             dbc.CardBody([
-                dbc.Row([               #GRAPH
+                dbc.Row([ #GRAPH
                     dbc.Col([
-                        dcc.Graph(figure=fig)
-                    ])
+                        dcc.Graph(id='daily-line', figure=get_graph(hist), config={'displayModeBar':False})
+                    ], width=12)
                 ]),
-                dbc.Row([               # CHANGE, SELL, BUY
+                dbc.Row([ #change price
                     dbc.Col([
-                        html.H5("OPEN"),
-                    ], width = 3),
-                    dbc.Col([
-                        html.H5("HIGH"),
-                    ], width = 3),
-                    dbc.Col([
-                        html.H5("LOW"),
-                    ], width = 3),
-                    dbc.Col([
-                        html.H5("CLOSE"),
-                    ], width = 3),
-                ], align = 'center', justify="evenly"
-                ),
+                        dcc.Graph(id='indicator-graph', figure=get_indicator(hist),
+                                    config={'displayModeBar':False},
+                                    )
+                    ], width={'size':3,'offset':2})
+                ]),
                 dbc.Row([
-                    dbc.Col([
-                        dbc.Label("${:,.2f}".format(float(hist['Open'][-1:])))
-                    ], width = 3),
-                    dbc.Col([
-                        dbc.Label("${:,.2f}".format(float(hist['High'][-1:])))
-                    ], width = 3),
-                    dbc.Col([
-                        dbc.Label("${:,.2f}".format(float(hist['Low'][-1:])))
-                    ], width = 3),
-                    dbc.Col([
-                        dbc.Label("${:,.2f}".format(float(hist['Close'][-1:])))
-                    ], width = 3),
+                    dbc.Col([])               
                 ], align = 'center', justify="evenly"
                 ),
             ])
         ], style={"width": "22rem"}
         )
+
+#get indicator
+def get_indicator(x):
+    day_start = x[x['Datetime'] == x['Datetime'].min()]['Close'].values[0]
+    day_end = x[x['Datetime'] == x['Datetime'].max()]['Close'].values[0]
+    fig = go.Figure(go.Indicator(
+        mode="number+delta",
+        value=day_end,
+        number = {'prefix': "$"},
+        delta={'reference': day_start, 'relative': True, 'valueformat':'.2%', 'position': "top"}))
+    fig.update_traces(delta_font={'size':13}, number_font={'size':20, 'color':'black'})
+    fig.update_layout(height=40, width=75)
+
+    if day_end >= day_start:
+        fig.update_traces(delta_increasing_color='green')
+    elif day_end < day_start:
+        fig.update_traces(delta_decreasing_color='red')
+    return fig
+
+#get graph
+def get_graph(x):
+    x_graph = x.iloc[::-1]
+    fig = px.line(x_graph, x='Datetime', y='Close',
+                   range_y=[x_graph['Close'].min(), x_graph['Close'].max()],
+                   height=120).update_layout(margin=dict(t=0, r=0, l=0, b=20),
+                                             paper_bgcolor='rgba(0,0,0,0)',
+                                             plot_bgcolor='rgba(0,0,0,0)',
+                                             yaxis=dict(
+                                             title=None,
+                                             showgrid=False,
+                                             showticklabels=False
+                                             ),
+                                             xaxis=dict(
+                                             title=None,
+                                             showgrid=False,
+                                             showticklabels=False
+                                             ))
+
+    day_start = x_graph[x_graph['Datetime'] == x_graph['Datetime'].min()]['Close'].values[0]
+    day_end = x_graph[x_graph['Datetime'] == x_graph['Datetime'].max()]['Close'].values[0]
+
+    if day_end >= day_start:
+        return fig.update_traces(fill='tozeroy',line={'color':'green'})
+    elif day_end < day_start:
+        return fig.update_traces(fill='tozeroy',
+                             line={'color': 'red'})
+    return fig    

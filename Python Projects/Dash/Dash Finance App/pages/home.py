@@ -58,7 +58,7 @@ app.layout = dbc.Container([
 )
 def get_cards(x):
     print(x)
-    return ['Loading Data',
+    return [{},
             create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
             create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
             create_card(nasdaq['Symbol'].sample().to_string().split()[1])]
