@@ -17,18 +17,6 @@ def create_card(ticker):
         if bool(hist.empty) is False:
             print('agora deu bom')
             break
-    #make indicators
-    day_start = hist[hist['Datetime'] == hist['Datetime'].min()]['Close'].values[0]
-    day_end = hist[hist['Datetime'] == hist['Datetime'].max()]['Close'].values[0]
-    fig = go.Figure(data=[go.Candlestick(x=hist['Datetime'],
-                    open  = hist['Open'],
-                    high  = hist['High'],
-                    low   = hist['Low'],
-                    close = hist['Close'])
-                    ])
-    fig.update_layout(xaxis_rangeslider_visible=False,
-                      yaxis={'visible': False, 'showticklabels': False},
-                      xaxis={'visible': False, 'showticklabels': False},)
     return dbc.Card([
             dbc.Row([
                 dbc.Col([
@@ -36,7 +24,7 @@ def create_card(ticker):
                         src = info['logo_url'],
                         top = 'False',
                         style = {"width":'4rem', "padding": "0.5rem 0.5rem"},
-                        class_name = "rounded-circle",
+                        #class_name = "rounded-circle",
                     ),
                 ], width = 3),
                 dbc.Col([
@@ -65,6 +53,37 @@ def create_card(ticker):
         ], style={"width": "22rem"}
         )
 
+#tiny card
+def create_tinycard(ticker):
+    df = yf.Ticker(ticker)
+    info = df.info
+    hist = df.history('1d','1m').reset_index()
+    while bool(hist.empty) is True:
+        print('deu ruim')
+        df = yf.Ticker(nasdaq['Symbol'].sample().to_string().split()[1])
+        hist = df.history('1d','1m').reset_index()
+        if bool(hist.empty) is False:
+            print('agora deu bom')
+            break
+    return dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    dbc.Row(html.H4([info['symbol']])),
+                    dbc.Row([
+                        dcc.Graph(figure=get_indicator(hist),
+                            config={'displayModeBar':False},
+                        )
+                    ])
+                ]),
+                dbc.Col([
+                    dcc.Graph(figure=get_graph(hist), config={'displayModeBar':False})
+                    ], width=7
+                )
+            ]),
+        ])
+    ])
+
 #get indicator
 def get_indicator(x):
     day_start = x[x['Datetime'] == x['Datetime'].min()]['Close'].values[0]
@@ -76,7 +95,6 @@ def get_indicator(x):
         delta={'reference': day_start, 'relative': True, 'valueformat':'.2%', 'position': "top"}))
     fig.update_traces(delta_font={'size':13}, number_font={'size':20, 'color':'black'})
     fig.update_layout(height=40, width=75)
-
     if day_end >= day_start:
         fig.update_traces(delta_increasing_color='green')
     elif day_end < day_start:

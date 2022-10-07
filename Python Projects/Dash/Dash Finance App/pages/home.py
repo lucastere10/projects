@@ -8,7 +8,7 @@ import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 import plotly.graph_objects as go
-from create_card import create_card
+from create_card import create_card, create_tinycard
 from sidebar import sidebar, search_bar, nasdaq, callback_sidebar_collapse, callback_open_offcanvas, callback_filter_dropdown
 from styles.styles import SIDEBAR_STYLE, SIDEBAR_HIDEN, CONTENT_STYLE, CONTENT_STYLE1
 
@@ -38,6 +38,12 @@ app.layout = dbc.Container([
     ]),
     html.Br(),
     dbc.Row([
+        dbc.Col(id = 'tinychart1-id', width=3),
+        dbc.Col(id = 'tinychart2-id', width=3),
+        dbc.Col(id = 'tinychart3-id', width=3),
+        dbc.Col(id = 'tinychart4-id', width=3),
+    ]),
+    dbc.Row([
         dcc.Loading(
             id="loading-id", type="default", color = '#1a1a1a',
             children=html.Div(id="loading-output-id"),
@@ -54,6 +60,10 @@ app.layout = dbc.Container([
     Output('chart1-id','children'),    
     Output('chart2-id','children'),
     Output('chart3-id','children'),
+    Output('tinychart1-id','children'),    
+    Output('tinychart2-id','children'),
+    Output('tinychart3-id','children'),
+    Output('tinychart4-id','children'),
     Input('interval-component-id', 'n_intervals')   
 )
 def get_cards(x):
@@ -61,10 +71,14 @@ def get_cards(x):
     return [{},
             create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
             create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
-            create_card(nasdaq['Symbol'].sample().to_string().split()[1])]
+            create_card(nasdaq['Symbol'].sample().to_string().split()[1]),
+            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            ]
             #nasdaq['Symbol'].sample().to_string().split()[1]
         
-
 #collapse sidebar
 callback_sidebar_collapse(app)
 
