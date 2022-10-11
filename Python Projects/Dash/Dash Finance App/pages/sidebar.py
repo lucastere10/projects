@@ -53,7 +53,26 @@ sidebar = html.Div([
     ], style=SIDEBAR_STYLE,  id="sidebar-id",
 )
 
-# navbar -------------
+### Mobile Sidebar
+mobile_sidebar = html.Div([
+    dbc.Row([
+        dbc.Nav([
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], 
+                            href="/", active="exact", id = 'mhome-id'),                
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], 
+                            href="/stocks", active="exact", id = 'mstocks-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], 
+                            href="/crypto", active="exact", id = 'mcrypto-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Overview"], 
+                            href="/overview", active="exact", id = 'moverview-id'),
+            ],
+            pills=True,
+        ),
+    ])            
+],  id="msidebar-id",
+)
+
+# Offcanvas Fiilter -------------
 filter = html.Div(
     [
         dbc.Button([html.I(className = "fa-solid fa-filter")],
@@ -83,11 +102,36 @@ filter = html.Div(
     ]
 )
 
+### Mobile offcanvas menu
+mobile_offcanvas = html.Div(
+    [   dbc.Button([html.I(className = "fa-solid fa-bars")],
+            color="primary", className="ms-2", n_clicks=0,  
+            style={'font-size': '12px', 'display': 'inline-block'},
+            id = 'mobile-offcanvas-button-id', size="sm"
+            ),
+        dbc.Offcanvas([
+                html.Hr(),
+                dbc.NavLink([html.I(className = "fa-solid fa-user"), "  My Portfolio"], 
+                            href="/portfolio", active="exact", id = 'mportfolio-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-envelope"), "  Contact"], 
+                            href="/contact", active="exact", id = 'mcontact-id'),
+                html.Hr(),
+                dbc.Button([html.I(className = "fa-solid fa-address-book"), "  Hire Me"])
+        ],
+        id="mobile_offcanvas-id",
+        title="LOGO",
+        is_open=False,
+        ),
+    ]
+)
+
+
+#Searchbar
 search_bar = dbc.Row([
     dbc.Col([filter], width = 'auto'),
     dbc.Col([
         dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
-    ])
+    ]),
 ])
 
 #sidebar colapse
@@ -216,3 +260,17 @@ def callback_filter_dropdown(app):
             ], is_open = True),
             filtered_df = nasdaq
         return filtered_df['Name'].unique()
+
+# Open Mobile Offcanvas Menu 
+def callback_open_mobile_offcanvas(app):
+    @app.callback(
+        Output("mobile_offcanvas-id", "is_open"),
+        [Input("mobile-offcanvas-button-id", "n_clicks")],
+        [State("mobile_offcanvas-id", "is_open")],
+    )
+    def toggle_offcanvas(n1, is_open):
+        if not "mobile_offcanvas-id":
+            raise PreventUpdate
+        if n1:
+            return not is_open
+        return is_open

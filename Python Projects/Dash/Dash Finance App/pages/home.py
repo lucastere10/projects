@@ -9,7 +9,7 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 import plotly.graph_objects as go
 from create_card import create_card, create_tinycard
-from sidebar import sidebar, search_bar, nasdaq, callback_sidebar_collapse, callback_open_offcanvas, callback_filter_dropdown
+from sidebar import sidebar, search_bar, nasdaq, callback_sidebar_collapse, callback_open_offcanvas, callback_filter_dropdown, callback_open_mobile_offcanvas
 from styles.styles import SIDEBAR_STYLE, SIDEBAR_HIDEN, CONTENT_STYLE, CONTENT_STYLE1
 
 # APP --------------
@@ -81,6 +81,15 @@ def get_cards(x):
         
 #collapse sidebar
 callback_sidebar_collapse(app)
+
+# Open Offcanvas Button 
+callback_open_offcanvas(app)
+
+# Filter Dropdown Values
+callback_filter_dropdown(app)
+
+# Mobile Dropdown Menu
+callback_open_mobile_offcanvas(app)
 
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)
