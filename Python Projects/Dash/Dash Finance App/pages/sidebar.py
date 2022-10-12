@@ -52,27 +52,7 @@ sidebar = html.Div([
         ),            
     ], style=SIDEBAR_STYLE,  id="sidebar-id",
 )
-
-### Mobile Sidebar
-mobile_sidebar = html.Div([
-    dbc.Row([
-        dbc.Nav([
-                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], 
-                            href="/", active="exact", id = 'mhome-id'),                
-                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], 
-                            href="/stocks", active="exact", id = 'mstocks-id'),
-                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], 
-                            href="/crypto", active="exact", id = 'mcrypto-id'),
-                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Overview"], 
-                            href="/overview", active="exact", id = 'moverview-id'),
-            ],
-            pills=True,
-        ),
-    ])            
-],  id="msidebar-id",
-)
-
-# Offcanvas Fiilter -------------
+# Offcanvas Fiilter ------------------------------
 filter = html.Div(
     [
         dbc.Button([html.I(className = "fa-solid fa-filter")],
@@ -102,7 +82,35 @@ filter = html.Div(
     ]
 )
 
-### Mobile offcanvas menu
+# Searchbar -------------
+search_bar = dbc.Row([
+    dbc.Col([filter], width = 'auto'),
+    dbc.Col([
+        dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
+    ]),
+])
+
+### MOBILE ###
+# Mobile Sidebar -------------
+mobile_sidebar = html.Div([
+    dbc.Row([
+        dbc.Nav([
+                dbc.NavLink([html.I(className = "fa-solid fa-house"), "  Home"], 
+                            href="/", active="exact", id = 'mhome-id'),                
+                dbc.NavLink([html.I(className = "fa-solid fa-chart-bar"), "  Stocks"], 
+                            href="/stocks", active="exact", id = 'mstocks-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-coins"), "  Crypto"], 
+                            href="/crypto", active="exact", id = 'mcrypto-id'),
+                dbc.NavLink([html.I(className = "fa-solid fa-eye"), "  Overview"], 
+                            href="/overview", active="exact", id = 'moverview-id'),
+            ],
+            pills=True,
+        ),
+    ])            
+],  id="msidebar-id",
+)
+
+# Mobile offcanvas menu ------------------------------
 mobile_offcanvas = html.Div(
     [   dbc.Button([html.I(className = "fa-solid fa-bars")],
             color="primary", className="ms-2", n_clicks=0,  
@@ -125,15 +133,7 @@ mobile_offcanvas = html.Div(
     ]
 )
 
-
-#Searchbar
-search_bar = dbc.Row([
-    dbc.Col([filter], width = 'auto'),
-    dbc.Col([
-        dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
-    ]),
-])
-
+### CALLBACKS ###
 #sidebar colapse
 def callback_sidebar_collapse(app):
     @app.callback(

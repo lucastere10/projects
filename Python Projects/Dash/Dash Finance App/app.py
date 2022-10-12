@@ -9,8 +9,7 @@ import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
 import pandas as pd 
 import requests
-from pages import contact
-from pages.create_card import create_card
+from pages import contact, home, overview, not_found_404
 
 app = dash.Dash(__name__, use_pages=True, 
                 external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
@@ -18,20 +17,20 @@ app = dash.Dash(__name__, use_pages=True,
                 meta_tags=[{'name': 'viewport',
                             'content': 'width=device-width, initial-scale=1.0'}]
                 )
+server = app.server
 
 app.layout = html.Div([
-    html.Div(
-        [
-            html.Div(
-                dcc.Link(
-                    f"{page['name']} - {page['path']}", href=page["relative_path"]
-                )
-            )
-            for page in dash.page_registry.values()
-        ]
-    ),
-    dash.page_container 
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
 ])
+
+@callback(Output('page-content', 'children'),
+              Input('url', 'pathname'))
+def display_page(pathname):
+    if pathname == '/':
+        return contact.layout
+    else:
+        return not_found_404.layout
 
 if __name__ == '__main__':
     app.run_server(debug=True)
