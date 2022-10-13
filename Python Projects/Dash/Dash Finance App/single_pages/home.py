@@ -1,16 +1,21 @@
 #---------------------------------------------
 ### LIBS ###
+import sys
 from turtle import ht, width
 import dash  #pip install dash
 from dash import html, dcc, Output, Input, State, dash_table                    
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from pages.modules.module_cards import create_card, create_tinycard
-from pages.modules.module_sidebar import sidebar, searchbar, nasdaq, callback_sidebar_collapse, callback_open_offcanvas, callback_filter_dropdown, callback_open_mobile_offcanvas
-from pages.styles.app_styles import SIDEBAR_STYLE, SIDEBAR_HIDEN, CONTENT_STYLE, CONTENT_STYLE1
+
+#import sys path
+sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
+from modules import module_cards, module_sidebar
+from styles import app_styles
+nasdaq = module_sidebar.nasdaq
 
 # APP --------------
 app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
@@ -27,7 +32,7 @@ app.layout = dbc.Container([
         interval=1*300000, # in milliseconds
         n_intervals=0
     ),
-    dbc.Row(dbc.Col([searchbar], width = 10, align='center'), justify="center"),
+    dbc.Row(dbc.Col([module_sidebar.searchbar], width = 10, align='center'), justify="center"),
     html.Br(),
     #dbc.Row(dbc.Col(dbc.Button('GET DATA',id = 'chart-button-id'), width = 2)),
     #html.Br(),
@@ -49,8 +54,8 @@ app.layout = dbc.Container([
             children=html.Div(id="loading-output-id"),
         ),
     ]),
-    sidebar,
-], style = CONTENT_STYLE, id = 'layout-id')
+    module_sidebar.sidebar,
+], style = app_styles.CONTENT_STYLE, id = 'layout-id')
 
 ### CALLBACKS ### ------------------------------------------------------------------
 
@@ -69,27 +74,27 @@ app.layout = dbc.Container([
 def get_cards(x):
     print(x)
     return [{},
-            create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
-            create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
-            create_card(nasdaq['Symbol'].sample().to_string().split()[1]),
-            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
-            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
-            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
-            create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            module_cards.create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
+            module_cards.create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
+            module_cards.create_card(nasdaq['Symbol'].sample().to_string().split()[1]),
+            module_cards.create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            module_cards.create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            module_cards.create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
+            module_cards.create_tinycard(nasdaq['Symbol'].sample().to_string().split()[1]),
             ]
             #nasdaq['Symbol'].sample().to_string().split()[1]
         
 #collapse sidebar
-callback_sidebar_collapse(app)
+module_sidebar.callback_sidebar_collapse(app)
 
 # Open Offcanvas Button 
-callback_open_offcanvas(app)
+module_sidebar.callback_open_offcanvas(app)
 
 # Filter Dropdown Values
-callback_filter_dropdown(app)
+module_sidebar.callback_filter_dropdown(app)
 
 # Mobile Dropdown Menu
-callback_open_mobile_offcanvas(app)
+module_sidebar.callback_open_mobile_offcanvas(app)
 
 if __name__=='__main__':
     app.run_server(debug=True, port=3000)

@@ -1,5 +1,6 @@
 #---------------------------------------------
 ### LIBS ###
+import sys
 from contextlib import nullcontext
 from turtle import ht, width
 import dash  #pip install dash
@@ -9,10 +10,13 @@ import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
 import pandas as pd 
 import plotly.graph_objects as go
-from modules.module_sidebar import sidebar, search_bar, callback_sidebar_collapse, callback_open_offcanvas , callback_filter_dropdown
-from styles.styles import SIDEBAR_STYLE, SIDEBAR_HIDEN, CONTENT_STYLE, CONTENT_STYLE1, SMALLCARD_STYLE
-
 import requests
+
+sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
+from modules import module_cards, module_sidebar
+from styles import app_styles
+nasdaq = module_sidebar.nasdaq
+
 key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
 # APP --------------
@@ -33,7 +37,7 @@ def small_card(x,y):
             html.H4(y,className="card-title",style={'fontSize': '.7em'},id = f"{y}-sc-title-id"),
             html.H6(x[y],className="card-subtitle",style={'fontSize': '1em', 'font-weight': 'bold'},id = f"{y}-sc-sub-id"),
     ]),
-    style = SMALLCARD_STYLE,
+    style = app_styles.SMALLCARD_STYLE,
     )
 
 #feeds
@@ -161,7 +165,7 @@ app.layout = dbc.Container([
     dcc.Store(id = 'feed-store-id'),
     dcc.Store(id = 'chart-store-id'),
     # Search Bar
-    dbc.Row(dbc.Col([search_bar], width = 10, align='center'), justify="center"),
+    dbc.Row(dbc.Col([module_sidebar.searchbar], width = 10, align='center'), justify="center"),
     html.Hr(),
     # Name And Symbol | Description
     dcc.Loading(
@@ -181,8 +185,8 @@ app.layout = dbc.Container([
     dbc.Row([
         tabs
     ]),
-    sidebar,
-], style = CONTENT_STYLE, id = 'layout-id' )
+    module_sidebar.sidebar,
+], style = app_styles.CONTENT_STYLE, id = 'layout-id' )
 
 
 ### CALLBACKS ### ------------------------------------------------------------------
@@ -200,10 +204,10 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 # Open Offcanvas Button 
-callback_open_offcanvas(app)
+module_sidebar.callback_open_offcanvas(app)
 
 # Filter Dropdown Values
-callback_filter_dropdown(app)
+module_sidebar.callback_filter_dropdown(app)
 
 #get stock tickers and data
 @app.callback(
@@ -314,7 +318,7 @@ def get_chart(x):
                     ])
     return fig
 
-callback_sidebar_collapse(app)
+module_sidebar.callback_sidebar_collapse(app)
 
 # Run App --------------------------------------------
 if __name__=='__main__':
