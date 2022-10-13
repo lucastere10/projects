@@ -1,9 +1,15 @@
+#---------------------------------------------
+### LIBS ###
+import sys
 from dash import dcc, html, State, Input, Output
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import yfinance as yf
 import plotly.express as px
 import plotly.graph_objects as go
-from module_sidebar import nasdaq
+
+sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
+from modules import module_sidebar
+nasdaq = module_sidebar.nasdaq
 
 # card ---------------
 def create_card(ticker):  
