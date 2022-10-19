@@ -220,7 +220,6 @@ def fun_stock_search(value):
     chart_data = c.json()
     return stock_data, feed_data, chart_data, {}
 
-
 #Get Stock Title and Symbol
 @callback(
     Output('title-id','children'),
