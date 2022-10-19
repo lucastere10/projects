@@ -44,5 +44,8 @@ module_sidebar.callback_filter_dropdown(app)
 # Mobile Dropdown Menu
 module_sidebar.callback_open_mobile_offcanvas(app)
 
+# Dropdown Tooltip
+module_sidebar.callback_dropdown_tooltip(app)
+
 if __name__ == '__main__':
     app.run_server(debug=True)

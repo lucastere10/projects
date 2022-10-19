@@ -88,10 +88,13 @@ searchbar = dbc.Row([
     dbc.Col([filter], width = 'auto'),
     dbc.Col([
         dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id',
-                    persistence = True,
-                    persistence_type = 'session'
+                    placeholder = 'Choose your stock',
+                    #persistence = True,
+                    #persistence_type = 'session',
+                    disabled=False
                     ),
     ]),
+    dbc.Tooltip(id = 'dropdown-tooltip-id', target='search-stock-dropdown-id', placement = 'top'),
 ])
 
 ### MOBILE ###
@@ -278,4 +281,16 @@ def callback_open_mobile_offcanvas(app):
         if n1:
             return not is_open
         return is_open
-        
+
+def callback_dropdown_tooltip(app):
+    @app.callback(
+        Output('search-stock-dropdown-id','disabled'),
+        Output('dropdown-tooltip-id','children'),
+        Input('test-location-id','href')
+    )
+    def enable_tooltip(x):
+        print(x)
+        if x == 'http://127.0.0.1:8050/overview':
+            return False, None
+        else:
+            return True, "Only works on 'Overview' page",
