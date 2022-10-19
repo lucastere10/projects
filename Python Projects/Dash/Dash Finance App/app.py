@@ -26,6 +26,7 @@ app.layout = dbc.Container([
     html.Div([module_sidebar.sidebar]),
     html.Div([dbc.Row(dbc.Col([module_sidebar.searchbar], width = 10, align='center'), justify="center")]),
     html.Br(),
+    dcc.Location(id='test-location-id', refresh=True),
     dash.page_container,
 ], style = app_styles.CONTENT_STYLE, id = 'layout-id')
 
@@ -42,8 +43,6 @@ module_sidebar.callback_filter_dropdown(app)
 
 # Mobile Dropdown Menu
 module_sidebar.callback_open_mobile_offcanvas(app)
-
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)

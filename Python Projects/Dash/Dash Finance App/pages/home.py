@@ -19,13 +19,6 @@ nasdaq = module_sidebar.nasdaq
 
 dash.register_page(__name__, path = '/')
 
-# APP --------------
-app = dash.Dash(__name__, external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
-                suppress_callback_exceptions=True,
-                meta_tags=[{'name': 'viewport',
-                            'content': 'width=device-width, initial-scale=1.0'}]
-                )
-
 # LAYOUT --------------
 layout = html.Div([
     #chart grid

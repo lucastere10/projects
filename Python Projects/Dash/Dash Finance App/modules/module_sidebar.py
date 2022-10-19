@@ -1,5 +1,5 @@
 from operator import xor
-from dash import dcc, html, State, Input, Output
+from dash import dcc, html, State, Input, Output, no_update
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import dash_daq as daq                     # pip install dash_daq
 import pandas as pd
@@ -7,6 +7,7 @@ from dash.exceptions import PreventUpdate
 from styles.app_styles import SIDEBAR_HIDEN, SIDEBAR_STYLE, CONTENT_STYLE, CONTENT_STYLE1
 
 nasdaq = pd.read_csv('Python Projects\\Dash\\Dash Finance App\\data\\nasdaq.csv')
+crypto = pd.read_csv('Python Projects\\Dash\\Dash Finance App\\data\\crypto.csv')
 
 # Sidebar ------------------------------
 sidebar = html.Div([
@@ -86,7 +87,10 @@ filter = html.Div(
 searchbar = dbc.Row([
     dbc.Col([filter], width = 'auto'),
     dbc.Col([
-        dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id'),
+        dcc.Dropdown(nasdaq['Name'].unique(), id = 'search-stock-dropdown-id',
+                    persistence = True,
+                    persistence_type = 'session'
+                    ),
     ]),
 ])
 
@@ -274,3 +278,4 @@ def callback_open_mobile_offcanvas(app):
         if n1:
             return not is_open
         return is_open
+        

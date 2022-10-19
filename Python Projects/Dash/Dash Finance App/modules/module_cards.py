@@ -2,14 +2,18 @@
 ### LIBS ###
 import sys
 from dash import dcc, html, State, Input, Output
+import pandas as pd
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 import yfinance as yf
 import plotly.express as px
 import plotly.graph_objects as go
+import requests
 
 sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
 from modules import module_sidebar
 nasdaq = module_sidebar.nasdaq
+crypto = module_sidebar.crypto
+key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
 # card ---------------
 def create_card(ticker):  
@@ -65,11 +69,11 @@ def create_tinycard(ticker):
     info = df.info
     hist = df.history('1d','1m').reset_index()
     while bool(hist.empty) is True:
-        print('deu ruim')
+        print('deu ruim tiny')
         df = yf.Ticker(nasdaq['Symbol'].sample().to_string().split()[1])
         hist = df.history('1d','1m').reset_index()
         if bool(hist.empty) is False:
-            print('agora deu bom')
+            print('agora deu bom tiny')
             break
     return dbc.Card([
         dbc.CardBody([
@@ -89,6 +93,40 @@ def create_tinycard(ticker):
             ]),
         ])
     ])
+
+### CRYPTO ###
+def create_crypto_card(ticker):
+    #Get Crypto Chart
+    crypto_url = f'https://www.alphavantage.co/query?function=CRYPTO_INTRADAY&symbol={ticker}&market=USD&interval=5min&apikey={key}'
+    c = requests.get(crypto_url)
+    chart_data = c.json()
+    symbol = chart_data['Meta Data']['2. Digital Currency Code']
+    name = chart_data['Meta Data']['3. Digital Currency Name']
+    chart_data = pd.DataFrame.from_dict(chart_data['Time Series Crypto (5min)'], orient='index').reset_index()
+    chart_data['Datetime'] = pd.to_datetime(chart_data['index'])
+    chart_data['Close'] = pd.to_numeric(chart_data['4. close'])
+    return dbc.Card([
+        dbc.CardBody([
+            dbc.Col([
+                dbc.Row([html.P(name, id = f"{name}-title")], style={'font-size': '16px'}),
+                dbc.Row([html.H4(symbol, id = f'{symbol}-id')], style={'font-size': '1px', 'font-weight' : 'bold'}),
+            ], width = 9),
+            dbc.Row([ #GRAPH
+                dbc.Col([
+                    dcc.Graph(id='daily-line', figure=get_graph(chart_data), config={'displayModeBar':False})
+                ], width=12)
+            ]),
+            dbc.Row([ #change price
+                dbc.Col([
+                    dcc.Graph(id='indicator-graph', figure=get_indicator(chart_data),
+                                config={'displayModeBar':False},
+                                )
+                ], width={'size':5,'offset':4.5})
+            ]),
+        ])
+    ], style={"width": "22rem"}
+    )
+    return fig
 
 # get indicator ---------------
 def get_indicator(x):
