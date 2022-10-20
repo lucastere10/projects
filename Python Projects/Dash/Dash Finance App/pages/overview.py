@@ -1,25 +1,22 @@
 #---------------------------------------------
 ### LIBS ###
 import sys
-from contextlib import nullcontext
-from turtle import ht, width
 import dash  #pip install dash
-from dash import html, dcc, Output, Input, State, dash_table, callback                   
+from dash import html, dcc, Output, Input, State, callback                   
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
-import dash_daq as daq                     # pip install dash_daq
 from dash.exceptions import PreventUpdate
 import pandas as pd 
 import plotly.graph_objects as go
 import requests
 
 sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
-from modules import module_cards, module_sidebar
+from modules import module_sidebar, module_keys
 from styles import app_styles
 nasdaq = module_sidebar.nasdaq
+#apikey
+key = module_keys.key
 
 dash.register_page(__name__, path = '/overview')
-
-key = '1D0MB8E05Q6QOL2L' #Alpha API Key
 
 #Stocks Tickters
 nasdaq = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\nasdaq.csv')

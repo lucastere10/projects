@@ -9,12 +9,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 
+#import sys path
 sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
-from modules import module_sidebar
+from modules import module_sidebar, module_keys
 nasdaq = module_sidebar.nasdaq
 crypto = module_sidebar.crypto
-key = '1D0MB8E05Q6QOL2L' #Alpha API Key
-
+#api key
+key = module_keys.key
 # card ---------------
 def create_card(ticker):  
     df = yf.Ticker(ticker)

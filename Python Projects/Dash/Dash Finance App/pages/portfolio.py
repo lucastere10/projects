@@ -1,6 +1,5 @@
 import dash  #pip install dash
-from dash import html, dcc, Output, Input, State                              
-import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
+from dash import html                              
 
 dash.register_page(__name__, path = '/portfolio')
 

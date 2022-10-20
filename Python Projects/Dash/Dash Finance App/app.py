@@ -1,17 +1,13 @@
 #---------------------------------------------
 ### LIBS ###
 import sys
-from turtle import ht, width
 import dash  #pip install dash
-from dash import html, dcc, Output, Input, State, dash_table, callback             
+from dash import html, dcc             
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
-import dash_daq as daq                     # pip install dash_daq
-from dash.exceptions import PreventUpdate
-import plotly.express as px
-import plotly.graph_objects as go
 
+#import sys path
 sys.path.insert(0,'Python Projects\Dash\Dash Finance App')
-from modules import module_sidebar, module_cards
+from modules import module_sidebar
 from styles import app_styles
 
 app = dash.Dash(__name__, use_pages=True, 
