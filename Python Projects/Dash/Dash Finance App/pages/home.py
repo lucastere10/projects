@@ -2,7 +2,7 @@
 ### LIBS ###
 import sys
 import dash  #pip install dash
-from dash import html, dcc, Output, Input, callback        
+from dash import html, dcc, Output, Input, callback, dash_table      
 import dash_bootstrap_components as dbc    # pip install dash-bootstrap-components
 
 #import sys path
@@ -21,8 +21,6 @@ layout = html.Div([
         n_intervals=0
     ),
     html.Br(),
-    #dbc.Row(dbc.Col(dbc.Button('GET DATA',id = 'chart-button-id'), width = 2)),
-    #html.Br(),
     dbc.Row([
         dbc.Col(id='chart1-id'),
         dbc.Col(id='chart2-id'),
@@ -41,6 +39,28 @@ layout = html.Div([
             children=html.Div(id="home-loading-output-id"),
         ),
     ]),
+    html.Br(),
+    dbc.Row([
+        dbc.Col([
+            dash_table.DataTable(
+                data = nasdaq.to_dict('records'), 
+                columns = [{"name": i, "id": i} for i in nasdaq.columns],
+                page_size = 10,
+                style_cell={
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis',
+                    'maxWidth': 350
+                },
+                tooltip_data=[
+                    {
+                        column: {'value': str(value), 'type': 'markdown'}
+                        for column, value in row.items()
+                    } for row in nasdaq.to_dict('records')
+                ],
+                tooltip_duration=None
+            )
+        ],width='auto')
+    ])
 ], id = 'home-layout-id')
 
 ### CALLBACKS ### ------------------------------------------------------------------
@@ -58,7 +78,7 @@ layout = html.Div([
     Input('interval-component-id', 'n_intervals')   
 )
 def get_cards(x):
-    print(x)
+    print(nasdaq.columns),
     return [{},
             module_cards.create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
             module_cards.create_card(nasdaq['Symbol'].sample().to_string().split()[1]), 
