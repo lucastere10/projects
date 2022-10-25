@@ -1,6 +1,10 @@
 ### --- DATAFRAME --- ###
+import sys
 import pandas as pd
+#import sys path
+sys.path.insert(0,'Python Projects\Dash\Dash Rent Prediction App')
 #read df
+
 df = pd.read_csv('Python Projects\Dash\Dash Rent Prediction App\data\House_Rent_Dataset.csv')
 #transform to datetime
 df['Posted On'] = pd.to_datetime(df['Posted On'])
@@ -21,3 +25,4 @@ df['Floor'] = df[['Rented Floor','Build Size']].values.tolist() #change original
 df = df[df['Rent'] < 1500000]
 #remove Area Type with low values
 df = df[df['Area Type'] != 'Built Area']
+df.to_csv('Python Projects\Dash\Dash Rent Prediction App\data\df.csv')
