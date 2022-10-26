@@ -1,40 +1,34 @@
 #libs
+import sys
 from cProfile import run
 import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.dependencies import Input, Output
-from modules import eda_dashboard, ml_analysis, module_dataframe
 
-### - Styles - ####
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+### - APP - ####
+app = dash.Dash(__name__, use_pages=True, 
+                external_stylesheets= [dbc.themes.LUX, dbc.icons.FONT_AWESOME],
+                suppress_callback_exceptions=True,
+                meta_tags=[{'name': 'viewport',
+                            'content': 'width=device-width, initial-scale=1.0'}]
+                )
 server = app.server
-colors = {"background": "#F3F6FA", "background_div": "white", 'text': '#009999'}
-app.config['suppress_callback_exceptions']= True
+
+#import sys path
+sys.path.insert(0,'Python Projects\Dash\Dash Rent Prediction App')
+from modules import module_sidebar
+from styles import app_styles
 
 ### - LAYOUT - ###
-app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
-    html.H1('House Rent Prediction Dashboard', style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }),
-      dcc.Tabs(id="tabs", className="row", style={"margin": "2% 3%","height":"20","verticalAlign":"middle"}, value='dem_tab', children=[
-        dcc.Tab(label='EDA Dashboard', value='eda_tab'),
-        dcc.Tab(label='ML Analysis', value='ml_tab')
-    ]),
-    html.Div(id='tabs-content')
-])
 
-@app.callback(Output('tabs-content', 'children'),
-              [Input('tabs', 'value')])
+app.layout = dbc.Container([
+    html.Div([module_sidebar.sidebar]),
+    html.Br(),
+    dash.page_container,
+], style = app_styles.CONTENT_STYLE, id = 'layout-id')
 
-def render_content(tab):
-    if tab == 'eda_tab':
-        return eda_dashboard.tab_1_layout
-    elif tab == 'ml_tab':
-        return ml_analysis.tab_1_layout
 
 if __name__ == '__main__':
     app.run_server(debug=True)
