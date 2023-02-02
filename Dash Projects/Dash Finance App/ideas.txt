@@ -1,0 +1,15 @@
+financial dashboard
+
+import data from pandas_database, allow inputs, give graphs and insigths
+
+Inputs:
+- Ticker
+- Region
+- Date
+- Name
+- 
+
+Graphs
+
+Tables
+- Historical Data
