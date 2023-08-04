@@ -18,7 +18,7 @@ programa
 			escreva("Acesso Negado")
 		}
 	}
-}
+} 
 
 
 
