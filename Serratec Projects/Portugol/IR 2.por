@@ -3,8 +3,7 @@ programa
 	//libs
 	inclua biblioteca Matematica --> mat
 	
-	funcao inicio()
-	{
+	funcao inicio(){
 		//variáveis
 		real salario, imposto = 0.00, desconto_dependentes = 0.00
 		inteiro n_dependentes = 0 // numero de dependentes
@@ -72,7 +71,7 @@ programa
  * Esta seção do arquivo guarda informações do Portugol Studio.
  * Você pode apagá-la se estiver utilizando outro editor.
  * 
- * @POSICAO-CURSOR = 2170; 
+ * @POSICAO-CURSOR = 75; 
  * @PONTOS-DE-PARADA = ;
  * @SIMBOLOS-INSPECIONADOS = ;
  * @FILTRO-ARVORE-TIPOS-DE-DADO = inteiro, real, logico, cadeia, caracter, vazio;
