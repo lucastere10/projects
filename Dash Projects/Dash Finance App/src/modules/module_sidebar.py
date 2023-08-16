@@ -6,8 +6,8 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 from styles.app_styles import SIDEBAR_HIDEN, SIDEBAR_STYLE, CONTENT_STYLE, CONTENT_STYLE1
 
-nasdaq = pd.read_csv("Dash Projects\\Dash Finance App\\data\\nasdaq.csv")
-crypto = pd.read_csv("Dash Projects\Dash Finance App\data\crypto.csv")
+nasdaq = pd.read_csv("data/nasdaq.csv")
+crypto = pd.read_csv("data/crypto.csv")
 
 # Sidebar ------------------------------
 sidebar = html.Div([
