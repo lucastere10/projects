@@ -19,7 +19,7 @@ key = module_keys.key
 dash.register_page(__name__, path = '/overview')
 
 #Stocks Tickters
-nasdaq = pd.read_csv('Python Projects\Dash\Dash Finance App\data\\nasdaq.csv')
+nasdaq = pd.read_csv("Dash Projects\Dash Finance App\data\\nasdaq.csv")
 
 ### FUNCTIONS ### ------------------------------------------------------------------
 #create cards
